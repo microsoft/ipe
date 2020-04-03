@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="description" content="Integrity Policy Enforcement (IPE) Documentation">
+        
+        <link rel="canonical" href="https://microsoft.github.io/ipe/">
+        <link rel="shortcut icon" href="img/favicon.ico">
+        <title>Integrity Policy Enforcement</title>
+        <link href="css/bootstrap.min.css" rel="stylesheet">
+        <link href="css/font-awesome.min.css" rel="stylesheet">
+        <link href="css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
+
+        <script src="js/jquery-1.10.2.min.js" defer></script>
+        <script src="js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script> 
+    </head>
+
+    <body class="homepage">
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href=".">Integrity Policy Enforcement</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem active">
+                                <a href="." class="nav-link">Home</a>
+                            </li>
+                            <li class="dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Usage <b class="caret"></b></a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="policy/" class="dropdown-item">Overview</a>
+</li>
+                                    
+<li>
+    <a href="policy/properties/" class="dropdown-item">Properties</a>
+</li>
+                                    
+<li>
+    <a href="policy/deployment/" class="dropdown-item">Deploying Policies</a>
+</li>
+                                    
+<li>
+    <a href="policy/examples/" class="dropdown-item">Example Policies</a>
+</li>
+                                    
+<li>
+    <a href="policy/events/" class="dropdown-item">Audit Events</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Technical <b class="caret"></b></a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="technical/threat-model/" class="dropdown-item">Threat Model</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="navitem">
+                                <a href="attribution/" class="nav-link">Attribution</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="faq/" class="nav-link">FAQ</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="license/" class="nav-link">License</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                            <li class="nav-item">
+                                <a rel="prev" class="nav-link disabled">
+                                    <i class="fa fa-arrow-left"></i> Previous
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a rel="next" href="policy/" class="nav-link">
+                                    Next <i class="fa fa-arrow-right"></i>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="https://github.com/microsoft/ipe/edit/master/docs/index.md" class="nav-link"><i class="fa fa-github"></i> Edit on GitHub</a>
+                            </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#integrity-policy-enforcement-ipe" class="nav-link">Integrity Policy Enforcement (IPE)</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#overview" class="nav-link">Overview</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#what-is-the-value-of-code-integrity" class="nav-link">What is the value of code integrity?</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#use-cases" class="nav-link">Use Cases</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#known-gaps" class="nav-link">Known Gaps</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="integrity-policy-enforcement-ipe">Integrity Policy Enforcement (IPE)</h1>
+<h2 id="overview">Overview</h2>
+<p>IPE is a Linux Security Module, which allows for a configurable
+policy to enforce integrity requirements on the whole system. It
+attempts to solve the issue of code integrity: that any code being
+executed (or files being read), are identical to the version that
+was built by a trusted source. Simply stated, IPE helps the owner of a 
+system ensure that only code they have authorized is allowed to execute.</p>
+<p>There are multiple implementations already within the Linux kernel that
+solve some measure of integrity verification. For instance, device-mapper
+verity, which ensures integrity for a block device, and fs-verity which
+is a system that ensures integrity for a filesystem. What these
+implementations lack is a measure of run-time verification that binaries
+are sourced from these locations. IPE aims to address this gap.</p>
+<p>IPE is separated between two major components: A configurable policy,
+provided by the LSM ("IPE Core"), and deterministic attributes provided by
+the kernel to evaluate files against, ("IPE Properties").</p>
+<h2 id="what-is-the-value-of-code-integrity">What is the value of code integrity?</h2>
+<p>Code integrity is identified as one of the most effective security mitigations
+for modern systems. With Private Key Infrastructure and code signing you can 
+effectively control the execution of all binaries on a system to be restricted to 
+a known subset. This eliminates attacks such as:</p>
+<ol>
+<li>Linker hijacking (LD_PRELOAD, LD_AUDIT, DLL Injection)</li>
+<li>Binary rewriting</li>
+<li>Malicious binary execution / loading</li>
+</ol>
+<p>As a result, most of the low effort, high value attacks are mitigated completely.</p>
+<h2 id="use-cases">Use Cases</h2>
+<p>IPE is designed for use in devices with a specific purpose like embedded systems
+(e.g. network firewall device in a data center), where all software
+and configuration is built and provisioned by the owner.</p>
+<p>Ideally, a system which leverages IPE is not intended for general
+purpose computing and does not utilize any software or configuration
+built by a third party. An ideal system to leverage IPE has both mutable
+and immutable components, however, all binary executable code is immutable.</p>
+<p>For the highest level of security, platform firmware should verify the the
+kernel and optionally the root filesystem (e.g. via U-Boot verified boot).
+This allows the entire system to be integrity verified.</p>
+<h2 id="known-gaps">Known Gaps</h2>
+<p>IPE cannot verify the integrity of anonymous executable memory, such as
+the trampolines created by gcc closures and libffi, or JIT'd code.
+Unfortunately, as this is dynamically generated code, there is no way for
+IPE to detect that this code has not been tampered with in transition
+from where it was built, to where it is running. As a result, IPE is
+incapable of tackling this problem for dynamically generated code.</p>
+<p>IPE cannot verify the integrity of interpreted languages' programs when
+these scripts invoked via <code>&lt;interpreter&gt; &lt;file&gt;</code>. This is because the way
+interpreters execute these files, the scripts themselves are not
+evaluated as executable code through one of IPE's hooks. Interpreters
+can be enlightened to the usage of IPE by trying to mmap a file into
+executable memory (+X), after opening the file and responding to the
+error code appropriately. This also applies to included files, or high
+value files, such as configuration files of critical system components.
+This specific gap is planned on being addressed within IPE.</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright (c) Microsoft. All rights reserved.</p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = ".",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="js/base.js" defer></script>
+        <script src="search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>
+                    From here you can search these documents. Enter
+                    your search terms below.
+                </p>
+                <form>
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
+
+<!--
+MkDocs version : 1.1
+Build Date UTC : 2020-04-03 17:25:56
+-->

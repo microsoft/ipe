@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        
+        <link rel="canonical" href="https://microsoft.github.io/ipe/policy/deployment/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>Deploying Policies - Integrity Policy Enforcement</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">Integrity Policy Enforcement</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="dropdown active">
+                                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Usage <b class="caret"></b></a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../" class="dropdown-item">Overview</a>
+</li>
+                                    
+<li>
+    <a href="../properties/" class="dropdown-item">Properties</a>
+</li>
+                                    
+<li>
+    <a href="./" class="dropdown-item active">Deploying Policies</a>
+</li>
+                                    
+<li>
+    <a href="../examples/" class="dropdown-item">Example Policies</a>
+</li>
+                                    
+<li>
+    <a href="../events/" class="dropdown-item">Audit Events</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Technical <b class="caret"></b></a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../technical/threat-model/" class="dropdown-item">Threat Model</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../attribution/" class="nav-link">Attribution</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../faq/" class="nav-link">FAQ</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../license/" class="nav-link">License</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                            <li class="nav-item">
+                                <a rel="prev" href="../properties/" class="nav-link">
+                                    <i class="fa fa-arrow-left"></i> Previous
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a rel="next" href="../examples/" class="nav-link">
+                                    Next <i class="fa fa-arrow-right"></i>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="https://github.com/microsoft/ipe/edit/master/docs/policy/deployment.md" class="nav-link"><i class="fa fa-github"></i> Edit on GitHub</a>
+                            </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="2"><a href="#deploying-policies" class="nav-link">Deploying Policies</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            
+            <li class="nav-item" data-level="2"><a href="#activating-policies" class="nav-link">Activating Policies</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            
+            <li class="nav-item" data-level="2"><a href="#deleting-policies" class="nav-link">Deleting Policies</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h2 id="deploying-policies">Deploying Policies</h2>
+<p>User policies are policies that are deployed from userland, through securityfs. 
+These policies are signed to enforce some level of authorization of the policies 
+(prohibiting an attacker from gaining root, and deploying an "allow all" policy), 
+through the PKCS#7 enveloped data format. These policies must be signed by a certificate
+that chains to the <code>SYSTEM_TRUSTED_KEYRING</code>. Through openssl, the signing
+can be done via:</p>
+<pre><code>openssl smime -sign -in &quot;$MY_POLICY&quot; -signer &quot;$MY_CERTIFICATE&quot; \
+  -inkey &quot;$MY_PRIVATE_KEY&quot; -binary -outform der -noattr -nodetach \
+  -out &quot;$MY_POLICY.p7s&quot;
+</code></pre>
+
+<p>Deploying the policies is done through securityfs, through the
+<code>new_policy</code> node. To deploy a policy, simply cat the file into the
+securityfs node:</p>
+<pre><code>cat &quot;$MY_POLICY.p7s&quot; &gt; /sys/kernel/security/ipe/new_policy
+</code></pre>
+
+<p>Upon success, this will create one subdirectory under
+<code>/sys/kernel/security/ipe/policies/</code>. The subdirectory will be the
+<code>policy_name</code> field of the policy deployed, so for the example above, the
+directory will be <code>/sys/kernel/security/ipe/policies/Ex\ Policy</code>. Within
+this directory, there will be two files: <code>raw</code> and <code>content</code>. </p>
+<p>The <code>raw</code> file is rw, reading will provide the raw PKCS#7 data that
+was provided to the kernel, representing the policy. Writing, will deploy
+an in-place policy update - if this policy is the currently running policy,
+the new updated policy will replace it immediately upon success.</p>
+<p>The <code>content</code> file is read only. Reading will provide the PKCS#7 inner
+content of the policy, which will be the plain text policy.</p>
+<p>Similarly, the <code>cat</code> command above will result in an error upon
+syntactically invalid or untrusted policies. It will also error if a
+policy already exists with the same <code>policy_name</code>. The write to the <code>raw</code>
+node will error upon syntactically invalid, untrusted policies, or if the
+payload fails the version check. The write will also fail if the
+<code>policy_name</code> in the payload does not match the existing policy.</p>
+<h2 id="activating-policies">Activating Policies</h2>
+<p>Deploying these policies will <em>not</em> cause IPE to start enforcing this
+policy. Once deployment is successful, a policy can be marked as active,
+via the sysctl, <code>ipe.active_policy</code>. IPE will enforce whatever policy is
+marked as active. For our example, we can activate the <code>Ex Policy</code> via:</p>
+<pre><code>sysctl ipe.active_policy=&quot;Ex Policy&quot;
+</code></pre>
+
+<p>At which point, <code>Ex Policy</code> will now be the enforced policy on the system.</p>
+<h2 id="deleting-policies">Deleting Policies</h2>
+<p>IPE also provides a way to delete policies. This can be done via the
+<code>del_policy</code> securityfs node, <code>/sys/kernel/security/ipe/del_policy</code>.
+Writing the <code>policy_name</code> of the policy to be deleted will delete that
+node: </p>
+<pre><code>echo -n &quot;$MY_POLICY_NAME&quot; &gt; /sys/kernel/security/ipe/del_policy
+</code></pre>
+
+<p>There are two requirements to delete policies:</p>
+<ol>
+<li>The policy being deleted must not be the active policy.</li>
+<li>The policy being deleted must not be the boot policy.</li>
+</ol>
+<p>NOTE: It's important to know above that the "echo" command will add a
+newline to the end of the input, and this will be considered as part of the
+filename. You can remove the newline via the -n parameter.</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright (c) Microsoft. All rights reserved.</p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>
+                    From here you can search these documents. Enter
+                    your search terms below.
+                </p>
+                <form>
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>

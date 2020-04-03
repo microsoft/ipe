@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        
+        <link rel="canonical" href="https://microsoft.github.io/ipe/policy/events/">
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>Audit Events - Integrity Policy Enforcement</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">Integrity Policy Enforcement</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="dropdown active">
+                                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Usage <b class="caret"></b></a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../" class="dropdown-item">Overview</a>
+</li>
+                                    
+<li>
+    <a href="../properties/" class="dropdown-item">Properties</a>
+</li>
+                                    
+<li>
+    <a href="../deployment/" class="dropdown-item">Deploying Policies</a>
+</li>
+                                    
+<li>
+    <a href="../examples/" class="dropdown-item">Example Policies</a>
+</li>
+                                    
+<li>
+    <a href="./" class="dropdown-item active">Audit Events</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Technical <b class="caret"></b></a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../technical/threat-model/" class="dropdown-item">Threat Model</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../attribution/" class="nav-link">Attribution</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../faq/" class="nav-link">FAQ</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../../license/" class="nav-link">License</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                            <li class="nav-item">
+                                <a rel="prev" href="../examples/" class="nav-link">
+                                    <i class="fa fa-arrow-left"></i> Previous
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a rel="next" href="../../technical/threat-model/" class="nav-link">
+                                    Next <i class="fa fa-arrow-right"></i>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="https://github.com/microsoft/ipe/edit/master/docs/policy/events.md" class="nav-link"><i class="fa fa-github"></i> Edit on GitHub</a>
+                            </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#audit-events" class="nav-link">Audit Events</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#policy-load-staging" class="nav-link">Policy Load / Staging</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#policy-activation-enablement" class="nav-link">Policy Activation / Enablement</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#ipe-mode-switch" class="nav-link">IPE Mode Switch</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#ipe-binary-event" class="nav-link">IPE Binary Event</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="audit-events">Audit Events</h1>
+<p>IPE will emit a several forms of messages to the audit channel. This section
+provides various information about these events and the descriptions of the
+fields that are emitted by these events to help with analysis of audit logs.</p>
+<h2 id="policy-load-staging">Policy Load / Staging</h2>
+<pre><code class="auditd">AUDIT1808 IPE policy_name=&quot;AllowAll&quot; policy_version=0.0.0 sha1=776FA5945C012EDDFC0866D7E3DE883CC0B67930
+</code></pre>
+
+<p>This event is emitted when a policy is loaded via <code>$SECURITYFS/ipe/new_policy</code> or <code>$SECURITYFS/ipe/policies/&lt;policy_name&gt;/raw</code>. It is emitted to the audit channel, and can be used to provide a record of what policies were loaded on the system.</p>
+<table>
+<thead>
+<tr>
+<th align="center">Field</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center">policy_name</td>
+<td align="left">The <code>policy_name</code> field of the policy</td>
+</tr>
+<tr>
+<td align="center">policy_version</td>
+<td align="left">The <code>policy_version</code> triple <em>parsed</em> from the policy<sup>1</sup></td>
+</tr>
+<tr>
+<td align="center">sha1</td>
+<td align="left">A SHA128 flat hash of the entire policy. Can be used to identify a policy.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="policy-activation-enablement">Policy Activation / Enablement</h2>
+<pre><code class="auditd">AUDIT1809 IPE policy_name=&quot;AllowAll&quot; policy_version=0.0.0
+</code></pre>
+
+<p>This event is emitted when a policy is activated via <code>sysctl ipe.active_policy</code> or when a policy is activated in place via <code>$SECURITYFS/ipe/policies/&lt;policy_name&gt;/raw</code>. It is emitted to the audit channel, and can be used to provide a record of when policies were made active.</p>
+<table>
+<thead>
+<tr>
+<th align="center">Field</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center">policy_name</td>
+<td align="left">The <code>policy_name</code> field of the policy</td>
+</tr>
+<tr>
+<td align="center">policy_version</td>
+<td align="left">The <code>policy_version</code> triple <em>parsed</em> from the policy<sup>1</sup></td>
+</tr>
+</tbody>
+</table>
+<h2 id="ipe-mode-switch">IPE Mode Switch</h2>
+<pre><code class="auditd">AUDIT1811 IPE mode=enforce
+AUDIT1811 IPE mode=permissive
+</code></pre>
+
+<p>This event is emitted when the IPE's mode of operation is changed through the <code>sysctl
+ipe.enforce</code>. It is emitted to the audit channel, additionally, this event is emitted
+early during system boot to the kernel channel (audit is not emitted) to identify
+what mode IPE is started in.</p>
+<table>
+<thead>
+<tr>
+<th align="center">Field</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center">mode</td>
+<td align="left">The mode that IPE is set to. Can be either: <code>enforce</code> or <code>permissive</code>. See <a href="../#modes">the modes documentation for more information.</a></td>
+</tr>
+</tbody>
+</table>
+<h2 id="ipe-binary-event">IPE Binary Event</h2>
+<pre><code class="auditd">AUDIT1810 IPE ctx_pid=297 ctx_op=EXECUTE ctx_hook=EXEC ctx_comm=&quot;sysctl&quot; ctx_audit_pathname=&quot;/usr/lib/libc-2.30.so&quot; ctx_ino=135442 ctx_dev=vda prop_boot_verified=TRUE prop_dmverity_roothash=NULL prop_dmverity_signature=FALSE rule=&quot;DEFAULT action=DENY&quot;
+</code></pre>
+
+<p>This event is emitted when IPE evaluates a binary. By default<sup>2</sup>, it will only
+be triggered on "action=DENY" events, or "blocks". This event provides a
+record of execution that violated policy and can be used to identify
+gaps within the currently deployed policy, or a system that may be
+under attack. Certain fields may be omitted, or replaced with <code>ERR(%d)</code>
+which identifes the error code when attempting to retrieve that value.</p>
+<table>
+<thead>
+<tr>
+<th align="center">Field</th>
+<th align="left">Description</th>
+<th align="center">Optional</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center"><code>ctx_pid</code></td>
+<td align="left">The <a href="https://en.wikipedia.org/wiki/Process_identifier">process ID</a> of the process being evaluated.</td>
+<td align="center">No</td>
+</tr>
+<tr>
+<td align="center"><code>ctx_op</code></td>
+<td align="left">The operation that IPE is evaluating the file under. See <a href="../properties/#op">op</a>.</td>
+<td align="center">No</td>
+</tr>
+<tr>
+<td align="center"><code>ctx_hook</code></td>
+<td align="left">The LSM hook that the file is being evaluated under. Provides a more granular description that <code>ctx_op</code>.</td>
+<td align="center">No</td>
+</tr>
+<tr>
+<td align="center"><code>ctx_comm</code></td>
+<td align="left">The effective name of the process, as evaluated by the kernel.</td>
+<td align="center">No</td>
+</tr>
+<tr>
+<td align="center"><code>ctx_audit_pathname</code></td>
+<td align="left">The effective absolute path to the file being evaluated. Walks past chroots and mount points.</td>
+<td align="center">Yes</td>
+</tr>
+<tr>
+<td align="center"><code>ctx_ino</code></td>
+<td align="left">The inode number of the file being evaluated.</td>
+<td align="center">Yes</td>
+</tr>
+<tr>
+<td align="center"><code>ctx_dev</code></td>
+<td align="left">The device name that the file belongs to.</td>
+<td align="center">Yes</td>
+</tr>
+<tr>
+<td align="center"><code>prop_boot_verified</code></td>
+<td align="left">The evaluation of the property, <code>boot_verified</code>. Can be ommitted if this property is not present in the kernel (not compiled in).</td>
+<td align="center">Yes</td>
+</tr>
+<tr>
+<td align="center"><code>prop_dmverity_roothash</code></td>
+<td align="left">The evaluation of the property, <code>dmverity_roothash</code>. Can be ommitted if this property is not present in the kernel (not compiled in).</td>
+<td align="center">Yes</td>
+</tr>
+<tr>
+<td align="center"><code>prop_dmverity_signature</code></td>
+<td align="left">The evaluation of the property, <code>dmverity_signature</code>. Can be ommitted if this property is not present in the kernel (not compiled in).</td>
+<td align="center">Yes</td>
+</tr>
+<tr>
+<td align="center"><code>rule</code></td>
+<td align="left">The plain-text approximation of the rule that was matched.</td>
+<td align="center">No</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<p><sup>1</sup> A policy with 4+ version numbers will parse successfully, but
+only the first three will be considered as part of the version. These fields
+will only emit the parsed version.</p>
+<p><sup>2</sup> IPE supports success auditing. When enabled, all events that pass IPE 
+policy and are not blocked will emit an audit event. This is disabled by 
+default, and can be enabled via the kernel command line
+<code>ipe.success_audit=(0|1)</code> or the sysctl <code>ipe.success_audit=(0|1)</code>.</p>
+<p>This is very noisy, as IPE will check every user-mode binary on the system,
+but is useful for debugging policies.</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright (c) Microsoft. All rights reserved.</p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>
+                    From here you can search these documents. Enter
+                    your search terms below.
+                </p>
+                <form>
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>

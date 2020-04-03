@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        
+        <link rel="canonical" href="https://microsoft.github.io/ipe/policy/">
+        <link rel="shortcut icon" href="../img/favicon.ico">
+        <title>Overview - Integrity Policy Enforcement</title>
+        <link href="../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
+
+        <script src="../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="..">Integrity Policy Enforcement</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href=".." class="nav-link">Home</a>
+                            </li>
+                            <li class="dropdown active">
+                                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Usage <b class="caret"></b></a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="./" class="dropdown-item active">Overview</a>
+</li>
+                                    
+<li>
+    <a href="properties/" class="dropdown-item">Properties</a>
+</li>
+                                    
+<li>
+    <a href="deployment/" class="dropdown-item">Deploying Policies</a>
+</li>
+                                    
+<li>
+    <a href="examples/" class="dropdown-item">Example Policies</a>
+</li>
+                                    
+<li>
+    <a href="events/" class="dropdown-item">Audit Events</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Technical <b class="caret"></b></a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../technical/threat-model/" class="dropdown-item">Threat Model</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="navitem">
+                                <a href="../attribution/" class="nav-link">Attribution</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../faq/" class="nav-link">FAQ</a>
+                            </li>
+                            <li class="navitem">
+                                <a href="../license/" class="nav-link">License</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                            <li class="nav-item">
+                                <a rel="prev" href=".." class="nav-link">
+                                    <i class="fa fa-arrow-left"></i> Previous
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a rel="next" href="properties/" class="nav-link">
+                                    Next <i class="fa fa-arrow-right"></i>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="https://github.com/microsoft/ipe/edit/master/docs/policy/index.md" class="nav-link"><i class="fa fa-github"></i> Edit on GitHub</a>
+                            </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#ipe-policy" class="nav-link">IPE Policy</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#early-user-mode-protection" class="nav-link">Early user-mode protection</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#modes" class="nav-link">Modes</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="ipe-policy">IPE Policy</h1>
+<p>The most essential part of IPE is its customizable policy which allows users 
+to specify the rules that the LSM should enforce for different operations. 
+This policy is designed to be both forward compatible and backwards compatible.
+There is one required line, at the top of the policy, indicating the
+policy name, and the policy version, for instance:</p>
+<pre><code>policy_name=&quot;Ex Policy&quot; policy_version=0.0.0
+</code></pre>
+
+<p>The policy name is a unique key identifying this policy in a human readable
+name. This is used to create nodes under securityfs as well as uniquely
+identify policies to deploy new policies vs update existing policies.</p>
+<p>The policy version indicates the current version of the policy (NOT the
+policy syntax version). This is used to prevent roll-back of policy to
+potentially insecure previous versions of the policy.</p>
+<p>The next portion of IPE policy, are rules. Rules are formed by key=value
+pairs, known as properties. IPE rules require two properties: "action",
+which determines what IPE does when it encounters a match against the
+rule, and "op", which determines when that rule should be evaluated.
+Thus, a minimal rule is:</p>
+<pre><code>op=EXECUTE action=ALLOW
+</code></pre>
+
+<p>This example will allow any execution. Additional properties are used to
+restrict attributes about the files being evaluated. These properties are
+intended to be deterministic attributes that are resident in the kernel.</p>
+<p>Order does not matter for the rule's properties - they can be listed in
+any order, however it is encouraged to have the "op" property be first,
+and the "action" property be last for readability. Rules are evaluated
+top-to-bottom. As a result, any revocation rules, or denies should be
+placed early in the file to ensure that these rules are evaluated before as
+rule with "action=ALLOW" is hit.</p>
+<p>IPE policy is designed to be forward compatible and backwards compatible,
+thus any failure to parse a rule will result in the line being ignored,
+and a warning being emitted. If backwards compatibility is not required,
+the kernel command line parameter and sysctl, <code>ipe.strict_parse</code> can be
+enabled, which will cause these warnings to be fatal.</p>
+<p>IPE policy supports comments. The character '#' will function as a 
+comment, ignoring all characters to the right of '#' until the newline.</p>
+<p>The default behavior of IPE evaluations can also be expressed in policy,
+through the <code>DEFAULT</code> statement. This can be done at a global level, or
+a per-operation level:</p>
+<pre><code># Global
+DEFAULT action=ALLOW
+
+# Operation Specific
+DEFAULT op=EXECUTE action=ALLOW
+</code></pre>
+
+<p>If a global default is unset, and a specific operation default is not set
+for an IPE operation, it will assume that the default action should be <code>ALLOW</code>.
+This is to preserve compatibility between policies and the LSM.</p>
+<h2 id="early-user-mode-protection">Early user-mode protection</h2>
+<p>With configurable policy-based LSMs, there's several issues with enforcing
+the configurable policies at startup, around reading and parsing the policy:</p>
+<ol>
+<li>The kernel <em>should</em> not read files from userland, so directly reading
+the policy file is prohibited.</li>
+<li>The kernel command line has a character limit, and one kernel module
+should not reserve the entire character limit for its own configuration.</li>
+<li>There are various boot loaders in the kernel ecosystem, so handing off
+a memory block would be costly to maintain.</li>
+</ol>
+<p>As a result, IPE has addressed this problem through a concept of a "boot
+policy". A boot policy is a minimal policy, compiled into the kernel. This
+policy is intended to get the system to a state where userland is setup
+and ready to receive commands, at which point a more complex policy ("user policies")
+can be deployed via securityfs. The boot policy can be specified via the
+Kconfig, <code>SECURITY_IPE_BOOT_POLICY</code>, which accepts a path to a plain-text
+version of the IPE policy to apply. This policy will be compiled into the
+kernel. If not specified, IPE will be disabled until a policy is deployed
+through securityfs, and activated through sysfs.</p>
+<h2 id="modes">Modes</h2>
+<p>IPE, similar to SELinux, supports two modes of operation: permissive
+and enforce. Permissive mode performs the same checks as enforce mode,
+and logs policy violations, but will not enforce the policy. This allows
+users to test policies before enforcing them.</p>
+<p>The default mode is enforce, and can be changed via the kernel command line
+parameter <code>ipe.enforce=(0|1)</code>, or the sysctl <code>ipe.enforce=(0|1)</code>. The
+ability to switch modes can be compiled out of the LSM via setting the
+Kconfig <code>CONFIG_SECURITY_IPE_PERMISSIVE_SWITCH</code> to N.</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright (c) Microsoft. All rights reserved.</p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../js/base.js" defer></script>
+        <script src="../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>
+                    From here you can search these documents. Enter
+                    your search terms below.
+                </p>
+                <form>
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
