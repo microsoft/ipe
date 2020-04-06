@@ -1,0 +1,21 @@
+site_name: Integrity Policy Enforcement
+repo_url: https://github.com/microsoft/ipe
+copyright: Copyright (c) Microsoft. All rights reserved.
+site_description: "Integrity Policy Enforcement (IPE) Documentation"
+site_url: "https://microsoft.github.io/ipe"
+theme:
+  name: 'mkdocs'
+
+nav:
+  - Home: "index.md"
+  - Usage:  
+    - Overview: "policy/index.md"
+    - Properties: "policy/properties.md"
+    - Deploying Policies: "policy/deployment.md"
+    - Example Policies: "policy/examples.md"
+    - Audit Events: "policy/events.md"
+  - Technical:
+    - Threat Model: "technical/threat-model.md"
+  - Attribution: "attribution.md"
+  - FAQ: "faq.md"
+  - License: "license.md"
