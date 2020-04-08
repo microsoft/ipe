@@ -14,5 +14,5 @@ measurement or attestation features, which IMA addresses.
 
 ### Where can I find the code for IPE?
 
-The IPE LSM code has been submitted for review to the Linux kernel project:
-https://lkml.kernel.org/lkml/20200406221439.1469862-4-deven.desai@linux.microsoft.com/T/#mfe85eb38a5596999f0bb8aa9dda3bee4e71eaa60
+The IPE LSM code has been submitted for review to the Linux kernel project
+[here](https://lkml.kernel.org/lkml/20200406221439.1469862-4-deven.desai@linux.microsoft.com/T/#mfe85eb38a5596999f0bb8aa9dda3bee4e71eaa60)
