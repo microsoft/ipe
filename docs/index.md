@@ -44,7 +44,7 @@ purpose computing and does not utilize any software or configuration
 built by a third party. An ideal system to leverage IPE has both mutable
 and immutable components, however, all binary executable code is immutable.
 
-For the highest level of security, platform firmware should verify the the
+For the highest level of security, platform firmware should verify the
 kernel and optionally the root filesystem (e.g. via U-Boot verified boot).
 This allows the entire system to be integrity verified.
 
