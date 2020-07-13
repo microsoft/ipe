@@ -39,14 +39,10 @@ top-to-bottom. As a result, any revocation rules, or denies should be
 placed early in the file to ensure that these rules are evaluated before as
 rule with "action=ALLOW" is hit.
 
-IPE policy is designed to be forward compatible and backwards compatible,
-thus any failure to parse a rule will result in the line being ignored,
-and a warning being emitted. If backwards compatibility is not required,
-the kernel command line parameter and sysctl, `ipe.strict_parse` can be
-enabled, which will cause these warnings to be fatal.
-
-IPE policy supports comments. The character '#' will function as a 
-comment, ignoring all characters to the right of '#' until the newline.
+Any unrecognized syntax in the policy will result in a fatal error to
+parse the policy. IPE policy supports comments. The character '#' will
+function as a  comment, ignoring all characters to the right of '#'
+until the newline.
 
 The default behavior of IPE evaluations can also be expressed in policy,
 through the `DEFAULT` statement. This can be done at a global level, or
