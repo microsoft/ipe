@@ -16,6 +16,9 @@ nav:
     - Audit Events: "usage/events.md"
   - Technical:
     - Threat Model: "technical/threat-model.md"
-  - Attribution: "attribution.md"
-  - FAQ: "faq.md"
-  - License: "license.md"
+    - Technical Diagrams: "technical/diagrams.md"
+  - Other:
+    - FAQ: "faq.md"
+    - Presentations: "presentations.md"
+    - Attribution: "attribution.md"
+    - License: "license.md"
