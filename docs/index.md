@@ -58,7 +58,7 @@ from where it was built, to where it is running. As a result, IPE is
 incapable of tackling this problem for dynamically generated code.
 
 IPE cannot verify the integrity of interpreted languages' programs when
-these scripts invoked via `<interpreter> <file>`. This is because the way
+these scripts invoked via `<interpreter> <file>`<sup>1</sup>. This is because the way
 interpreters execute these files, the scripts themselves are not
 evaluated as executable code through one of IPE's hooks. Interpreters
 can be enlightened to the usage of IPE by trying to mmap a file into
@@ -66,3 +66,9 @@ executable memory (+X), after opening the file and responding to the
 error code appropriately. This also applies to included files, or high
 value files, such as configuration files of critical system components.
 This specific gap is planned on being addressed within IPE.
+
+
+---
+
+<sup>1</sup> We are tracking [this](https://lore.kernel.org/linux-security-module/20200430132320.699508-1-mic@digikod.net/)
+proposal as a solution for this exact problem.

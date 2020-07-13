@@ -17,7 +17,7 @@ supports the following operations:
 
 `FIRMWARE`:
 > Pertains to firmware being loaded via the firmware_class interface. This
-covers both the preallocated buffer and the firmware file itself.
+> covers both the preallocated buffer and the firmware file itself.
 
 `KMODULE`:
 > Pertains to loading kernel modules via `modprobe` or `insmod`.
@@ -29,10 +29,16 @@ covers both the preallocated buffer and the firmware file itself.
 > Pertains to initrd images loading via `kexec --initrd`.
 
 `POLICY`:
-> Controls loading IMA policies through the `/sys/kernel/security/ima/policy` securityfs entry.
+> Controls loading IMA policies through the `/sys/kernel/security/ima/policy`
+> securityfs entry.
 
 `X509_CERT`:
-> Controls loading IMA certificates through the Kconfigs, `CONFIG_IMA_X509_PATH` and `CONFIG_EVM_X509_PATH`.
+> Controls loading IMA certificates through the Kconfigs, `CONFIG_IMA_X509_PATH`
+> and `CONFIG_EVM_X509_PATH`.
+
+`KERNEL_READ`:
+> Short-hand for the following operations: `FIRMWARE`, `KMODULE`,
+> `KEXEC_IMAGE`, `KEXEC_INITRAMFS`, `POLICY`, and `X509_CERTIFICATE`
 
 ## action
 

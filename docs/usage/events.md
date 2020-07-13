@@ -10,7 +10,10 @@ fields that are emitted by these events to help with analysis of audit logs.
 AUDIT1808 IPE policy_name="AllowAll" policy_version=0.0.0 sha1=776FA5945C012EDDFC0866D7E3DE883CC0B67930
 ```
 
-This event is emitted when a policy is loaded via `$SECURITYFS/ipe/new_policy` or `$SECURITYFS/ipe/policies/<policy_name>/raw`. It is emitted to the audit channel, and can be used to provide a record of what policies were loaded on the system.
+This event is emitted when a policy is loaded via `$SECURITYFS/ipe/new_policy`
+or `$SECURITYFS/ipe/policies/<policy_name>/raw`. It is emitted to the audit
+channel, and can be used to provide a record of what policies were loaded
+on the system.
 
 | Field		| Description	|
 |:-------------:|:--------------|
@@ -24,7 +27,10 @@ This event is emitted when a policy is loaded via `$SECURITYFS/ipe/new_policy` o
 AUDIT1809 IPE policy_name="AllowAll" policy_version=0.0.0
 ```
 
-This event is emitted when a policy is activated via `sysctl ipe.active_policy` or when a policy is activated in place via `$SECURITYFS/ipe/policies/<policy_name>/raw`. It is emitted to the audit channel, and can be used to provide a record of when policies were made active.
+This event is emitted when a policy is activated via `sysctl ipe.active_policy`
+or when a policy is activated in place via
+`$SECURITYFS/ipe/policies/<policy_name>/raw`. It is emitted to the audit
+channel, and can be used to provide a record of when policies were made active.
 
 | Field		| Description	|
 |:-------------:|:--------------|
@@ -53,9 +59,9 @@ what mode IPE is started in.
 AUDIT1810 IPE ctx_pid=297 ctx_op=EXECUTE ctx_hook=EXEC ctx_comm="sysctl" ctx_audit_pathname="/usr/lib/libc-2.30.so" ctx_ino=135442 ctx_dev=vda prop_boot_verified=TRUE prop_dmverity_roothash=NULL prop_dmverity_signature=FALSE rule="DEFAULT action=DENY"
 ```
 
-This event is emitted when IPE evaluates a binary. By default<sup>2</sup>, it will only
-be triggered on "action=DENY" events, or "blocks". This event provides a
-record of execution that violated policy and can be used to identify
+This event is emitted when IPE evaluates a binary. By default<sup>2</sup>, 
+it will only be triggered on "action=DENY" events, or "blocks". This event
+provides a record of execution that violated policy and can be used to identify
 gaps within the currently deployed policy, or a system that may be
 under attack. Certain fields may be omitted, or replaced with `ERR(%d)`
 which identifes the error code when attempting to retrieve that value.

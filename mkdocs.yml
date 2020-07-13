@@ -9,11 +9,11 @@ theme:
 nav:
   - Home: "index.md"
   - Usage:  
-    - Overview: "policy/index.md"
-    - Properties: "policy/properties.md"
-    - Deploying Policies: "policy/deployment.md"
-    - Example Policies: "policy/examples.md"
-    - Audit Events: "policy/events.md"
+    - Overview: "usage/index.md"
+    - Properties: "usage/properties.md"
+    - Deploying Policies: "usage/deployment.md"
+    - Example Policies: "usage/examples.md"
+    - Audit Events: "usage/events.md"
   - Technical:
     - Threat Model: "technical/threat-model.md"
   - Attribution: "attribution.md"
