@@ -1,0 +1,37 @@
+pool:
+  vmImage: 'ubuntu-18.04'
+
+trigger:
+  paths:
+    include:
+      - docs/*
+
+jobs:
+    - job: BuildDocs
+      displayName: Build Documentation
+      dependsOn: []
+      steps:
+        - task: Bash@3
+          displayName: Install Makedocs
+          inputs:
+            targetType: 'inline'
+            script: |
+              pip install mkdocs
+        - task: Bash@3
+          displayName: Build Site
+          inputs:
+            targetType: 'inline'
+            script: |
+              python -m mkdocs build -s -d build/
+        - task: CopyFiles@2
+          displayName: Copy Artifacts
+          inputs:
+            SourceFolder: build/
+            Contents: '**'
+            TargetFolder: $(Build.ArtifactStagingDirectory)
+        - task: PublishBuildArtifacts@1
+          displayName: Publish Artifacts
+          inputs:
+              PathToPublish: '$(Build.ArtifactStagingDirectory)'
+              ArtifactName: 'Doc Site'
+              publishLocation: 'Container'
