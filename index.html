@@ -41,23 +41,23 @@
                                 <ul class="dropdown-menu">
                                     
 <li>
-    <a href="policy/" class="dropdown-item">Overview</a>
+    <a href="usage/" class="dropdown-item">Overview</a>
 </li>
                                     
 <li>
-    <a href="policy/properties/" class="dropdown-item">Properties</a>
+    <a href="usage/properties/" class="dropdown-item">Properties</a>
 </li>
                                     
 <li>
-    <a href="policy/deployment/" class="dropdown-item">Deploying Policies</a>
+    <a href="usage/deployment/" class="dropdown-item">Deploying Policies</a>
 </li>
                                     
 <li>
-    <a href="policy/examples/" class="dropdown-item">Example Policies</a>
+    <a href="usage/examples/" class="dropdown-item">Example Policies</a>
 </li>
                                     
 <li>
-    <a href="policy/events/" class="dropdown-item">Audit Events</a>
+    <a href="usage/events/" class="dropdown-item">Audit Events</a>
 </li>
                                 </ul>
                             </li>
@@ -68,16 +68,32 @@
 <li>
     <a href="technical/threat-model/" class="dropdown-item">Threat Model</a>
 </li>
+                                    
+<li>
+    <a href="technical/diagrams/" class="dropdown-item">Technical Diagrams</a>
+</li>
                                 </ul>
                             </li>
-                            <li class="navitem">
-                                <a href="attribution/" class="nav-link">Attribution</a>
-                            </li>
-                            <li class="navitem">
-                                <a href="faq/" class="nav-link">FAQ</a>
-                            </li>
-                            <li class="navitem">
-                                <a href="license/" class="nav-link">License</a>
+                            <li class="dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Other <b class="caret"></b></a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="faq/" class="dropdown-item">FAQ</a>
+</li>
+                                    
+<li>
+    <a href="presentations/" class="dropdown-item">Presentations</a>
+</li>
+                                    
+<li>
+    <a href="attribution/" class="dropdown-item">Attribution</a>
+</li>
+                                    
+<li>
+    <a href="license/" class="dropdown-item">License</a>
+</li>
+                                </ul>
                             </li>
                         </ul>
 
@@ -93,7 +109,7 @@
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a rel="next" href="policy/" class="nav-link">
+                                <a rel="next" href="usage/" class="nav-link">
                                     Next <i class="fa fa-arrow-right"></i>
                                 </a>
                             </li>
@@ -190,14 +206,17 @@ IPE to detect that this code has not been tampered with in transition
 from where it was built, to where it is running. As a result, IPE is
 incapable of tackling this problem for dynamically generated code.</p>
 <p>IPE cannot verify the integrity of interpreted languages' programs when
-these scripts invoked via <code>&lt;interpreter&gt; &lt;file&gt;</code>. This is because the way
+these scripts invoked via <code>&lt;interpreter&gt; &lt;file&gt;</code><sup>1</sup>. This is because the way
 interpreters execute these files, the scripts themselves are not
 evaluated as executable code through one of IPE's hooks. Interpreters
 can be enlightened to the usage of IPE by trying to mmap a file into
 executable memory (+X), after opening the file and responding to the
 error code appropriately. This also applies to included files, or high
 value files, such as configuration files of critical system components.
-This specific gap is planned on being addressed within IPE.</p></div>
+This specific gap is planned on being addressed within IPE.</p>
+<hr />
+<p><sup>1</sup> We are tracking <a href="https://lore.kernel.org/linux-security-module/20200430132320.699508-1-mic@digikod.net/">this</a>
+proposal as a solution for this exact problem.</p></div>
             </div>
         </div>
 
@@ -227,7 +246,7 @@ This specific gap is planned on being addressed within IPE.</p></div>
                 </p>
                 <form>
                     <div class="form-group">
-                        <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
                     </div>
                 </form>
                 <div id="mkdocs-search-results"></div>
@@ -281,6 +300,6 @@ This specific gap is planned on being addressed within IPE.</p></div>
 </html>
 
 <!--
-MkDocs version : 1.1
-Build Date UTC : 2020-04-08 22:04:36
+MkDocs version : 1.1.2
+Build Date UTC : 2020-07-17 23:11:41.746203+00:00
 -->

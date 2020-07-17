@@ -6,7 +6,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         
         
-        <link rel="canonical" href="https://microsoft.github.io/ipe/policy/events/">
+        <link rel="canonical" href="https://microsoft.github.io/ipe/usage/events/">
         <link rel="shortcut icon" href="../../img/favicon.ico">
         <title>Audit Events - Integrity Policy Enforcement</title>
         <link href="../../css/bootstrap.min.css" rel="stylesheet">
@@ -68,16 +68,32 @@
 <li>
     <a href="../../technical/threat-model/" class="dropdown-item">Threat Model</a>
 </li>
+                                    
+<li>
+    <a href="../../technical/diagrams/" class="dropdown-item">Technical Diagrams</a>
+</li>
                                 </ul>
                             </li>
-                            <li class="navitem">
-                                <a href="../../attribution/" class="nav-link">Attribution</a>
-                            </li>
-                            <li class="navitem">
-                                <a href="../../faq/" class="nav-link">FAQ</a>
-                            </li>
-                            <li class="navitem">
-                                <a href="../../license/" class="nav-link">License</a>
+                            <li class="dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Other <b class="caret"></b></a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../faq/" class="dropdown-item">FAQ</a>
+</li>
+                                    
+<li>
+    <a href="../../presentations/" class="dropdown-item">Presentations</a>
+</li>
+                                    
+<li>
+    <a href="../../attribution/" class="dropdown-item">Attribution</a>
+</li>
+                                    
+<li>
+    <a href="../../license/" class="dropdown-item">License</a>
+</li>
+                                </ul>
                             </li>
                         </ul>
 
@@ -98,7 +114,7 @@
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a href="https://github.com/microsoft/ipe/edit/master/docs/policy/events.md" class="nav-link"><i class="fa fa-github"></i> Edit on GitHub</a>
+                                <a href="https://github.com/microsoft/ipe/edit/master/docs/usage/events.md" class="nav-link"><i class="fa fa-github"></i> Edit on GitHub</a>
                             </li>
                     </ul>
                 </div>
@@ -151,7 +167,10 @@ fields that are emitted by these events to help with analysis of audit logs.</p>
 <pre><code class="auditd">AUDIT1808 IPE policy_name=&quot;AllowAll&quot; policy_version=0.0.0 sha1=776FA5945C012EDDFC0866D7E3DE883CC0B67930
 </code></pre>
 
-<p>This event is emitted when a policy is loaded via <code>$SECURITYFS/ipe/new_policy</code> or <code>$SECURITYFS/ipe/policies/&lt;policy_name&gt;/raw</code>. It is emitted to the audit channel, and can be used to provide a record of what policies were loaded on the system.</p>
+<p>This event is emitted when a policy is loaded via <code>$SECURITYFS/ipe/new_policy</code>
+or <code>$SECURITYFS/ipe/policies/&lt;policy_name&gt;/raw</code>. It is emitted to the audit
+channel, and can be used to provide a record of what policies were loaded
+on the system.</p>
 <table>
 <thead>
 <tr>
@@ -178,7 +197,11 @@ fields that are emitted by these events to help with analysis of audit logs.</p>
 <pre><code class="auditd">AUDIT1809 IPE policy_name=&quot;AllowAll&quot; policy_version=0.0.0
 </code></pre>
 
-<p>This event is emitted when a policy is activated via <code>sysctl ipe.active_policy</code> or when a policy is activated in place via <code>$SECURITYFS/ipe/policies/&lt;policy_name&gt;/raw</code>. It is emitted to the audit channel, and can be used to provide a record of when policies were made active.</p>
+<p>This event is emitted when a policy is activated via the securityfs node,
+<code>/sys/kernel/security/ipe/policies/$policy_name/active</code>
+or when a policy is activated in place via
+<code>$SECURITYFS/ipe/policies/&lt;policy_name&gt;/raw</code>. It is emitted to the audit
+channel, and can be used to provide a record of when policies were made active.</p>
 <table>
 <thead>
 <tr>
@@ -224,9 +247,9 @@ what mode IPE is started in.</p>
 <pre><code class="auditd">AUDIT1810 IPE ctx_pid=297 ctx_op=EXECUTE ctx_hook=EXEC ctx_comm=&quot;sysctl&quot; ctx_audit_pathname=&quot;/usr/lib/libc-2.30.so&quot; ctx_ino=135442 ctx_dev=vda prop_boot_verified=TRUE prop_dmverity_roothash=NULL prop_dmverity_signature=FALSE rule=&quot;DEFAULT action=DENY&quot;
 </code></pre>
 
-<p>This event is emitted when IPE evaluates a binary. By default<sup>2</sup>, it will only
-be triggered on "action=DENY" events, or "blocks". This event provides a
-record of execution that violated policy and can be used to identify
+<p>This event is emitted when IPE evaluates a binary. By default<sup>2</sup>, 
+it will only be triggered on "action=DENY" events, or "blocks". This event
+provides a record of execution that violated policy and can be used to identify
 gaps within the currently deployed policy, or a system that may be
 under attack. Certain fields may be omitted, or replaced with <code>ERR(%d)</code>
 which identifes the error code when attempting to retrieve that value.</p>
@@ -303,7 +326,7 @@ will only emit the parsed version.</p>
 <p><sup>2</sup> IPE supports success auditing. When enabled, all events that pass IPE 
 policy and are not blocked will emit an audit event. This is disabled by 
 default, and can be enabled via the kernel command line
-<code>ipe.success_audit=(0|1)</code> or the sysctl <code>ipe.success_audit=(0|1)</code>.</p>
+<code>ipe.success_audit=(0|1)</code> or the securityfs node, <code>/sys/kernel/security/ipe/success_audit</code></p>
 <p>This is very noisy, as IPE will check every user-mode binary on the system,
 but is useful for debugging policies.</p></div>
             </div>
@@ -335,7 +358,7 @@ but is useful for debugging policies.</p></div>
                 </p>
                 <form>
                     <div class="form-group">
-                        <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
                     </div>
                 </form>
                 <div id="mkdocs-search-results"></div>

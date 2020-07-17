@@ -6,7 +6,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         
         
-        <link rel="canonical" href="https://microsoft.github.io/ipe/policy/">
+        <link rel="canonical" href="https://microsoft.github.io/ipe/usage/">
         <link rel="shortcut icon" href="../img/favicon.ico">
         <title>Overview - Integrity Policy Enforcement</title>
         <link href="../css/bootstrap.min.css" rel="stylesheet">
@@ -68,16 +68,32 @@
 <li>
     <a href="../technical/threat-model/" class="dropdown-item">Threat Model</a>
 </li>
+                                    
+<li>
+    <a href="../technical/diagrams/" class="dropdown-item">Technical Diagrams</a>
+</li>
                                 </ul>
                             </li>
-                            <li class="navitem">
-                                <a href="../attribution/" class="nav-link">Attribution</a>
-                            </li>
-                            <li class="navitem">
-                                <a href="../faq/" class="nav-link">FAQ</a>
-                            </li>
-                            <li class="navitem">
-                                <a href="../license/" class="nav-link">License</a>
+                            <li class="dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Other <b class="caret"></b></a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../faq/" class="dropdown-item">FAQ</a>
+</li>
+                                    
+<li>
+    <a href="../presentations/" class="dropdown-item">Presentations</a>
+</li>
+                                    
+<li>
+    <a href="../attribution/" class="dropdown-item">Attribution</a>
+</li>
+                                    
+<li>
+    <a href="../license/" class="dropdown-item">License</a>
+</li>
+                                </ul>
                             </li>
                         </ul>
 
@@ -98,7 +114,7 @@
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a href="https://github.com/microsoft/ipe/edit/master/docs/policy/index.md" class="nav-link"><i class="fa fa-github"></i> Edit on GitHub</a>
+                                <a href="https://github.com/microsoft/ipe/edit/master/docs/usage/index.md" class="nav-link"><i class="fa fa-github"></i> Edit on GitHub</a>
                             </li>
                     </ul>
                 </div>
@@ -167,13 +183,10 @@ and the "action" property be last for readability. Rules are evaluated
 top-to-bottom. As a result, any revocation rules, or denies should be
 placed early in the file to ensure that these rules are evaluated before as
 rule with "action=ALLOW" is hit.</p>
-<p>IPE policy is designed to be forward compatible and backwards compatible,
-thus any failure to parse a rule will result in the line being ignored,
-and a warning being emitted. If backwards compatibility is not required,
-the kernel command line parameter and sysctl, <code>ipe.strict_parse</code> can be
-enabled, which will cause these warnings to be fatal.</p>
-<p>IPE policy supports comments. The character '#' will function as a 
-comment, ignoring all characters to the right of '#' until the newline.</p>
+<p>Any unrecognized syntax in the policy will result in a fatal error to
+parse the policy. IPE policy supports comments. The character '#' will
+function as a  comment, ignoring all characters to the right of '#'
+until the newline.</p>
 <p>The default behavior of IPE evaluations can also be expressed in policy,
 through the <code>DEFAULT</code> statement. This can be done at a global level, or
 a per-operation level:</p>
@@ -184,9 +197,10 @@ DEFAULT action=ALLOW
 DEFAULT op=EXECUTE action=ALLOW
 </code></pre>
 
-<p>If a global default is unset, and a specific operation default is not set
-for an IPE operation, it will assume that the default action should be <code>ALLOW</code>.
-This is to preserve compatibility between policies and the LSM.</p>
+<p>A DEFAULT operation must be set for all understood
+operations within IPE. For policies to remain completely forwards
+compatible, it is recommended that users add a <code>DEFAULT action=ALLOW</code>
+and override the defaults on a per-operation basis.</p>
 <h2 id="early-user-mode-protection">Early user-mode protection</h2>
 <p>With configurable policy-based LSMs, there's several issues with enforcing
 the configurable policies at startup, around reading and parsing the policy:</p>
@@ -213,9 +227,9 @@ and enforce. Permissive mode performs the same checks as enforce mode,
 and logs policy violations, but will not enforce the policy. This allows
 users to test policies before enforcing them.</p>
 <p>The default mode is enforce, and can be changed via the kernel command line
-parameter <code>ipe.enforce=(0|1)</code>, or the sysctl <code>ipe.enforce=(0|1)</code>. The
-ability to switch modes can be compiled out of the LSM via setting the
-Kconfig <code>CONFIG_SECURITY_IPE_PERMISSIVE_SWITCH</code> to N.</p></div>
+parameter <code>ipe.enforce=(0|1)</code>, or the securityfs node,
+<code>/sys/kernel/security/ipe/enforce</code>. The ability to switch modes can be compiled
+out of the LSM via setting the Kconfig <code>CONFIG_SECURITY_IPE_PERMISSIVE_SWITCH</code> to N.</p></div>
             </div>
         </div>
 
@@ -245,7 +259,7 @@ Kconfig <code>CONFIG_SECURITY_IPE_PERMISSIVE_SWITCH</code> to N.</p></div>
                 </p>
                 <form>
                     <div class="form-group">
-                        <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
                     </div>
                 </form>
                 <div id="mkdocs-search-results"></div>

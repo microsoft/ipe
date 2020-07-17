@@ -6,9 +6,9 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         
         
-        <link rel="canonical" href="https://microsoft.github.io/ipe/technical/threat-model/">
+        <link rel="canonical" href="https://microsoft.github.io/ipe/usage/examples/">
         <link rel="shortcut icon" href="../../img/favicon.ico">
-        <title>Threat Model - Integrity Policy Enforcement</title>
+        <title>Example Policies - Integrity Policy Enforcement</title>
         <link href="../../css/bootstrap.min.css" rel="stylesheet">
         <link href="../../css/font-awesome.min.css" rel="stylesheet">
         <link href="../../css/base.css" rel="stylesheet">
@@ -36,41 +36,41 @@
                             <li class="navitem">
                                 <a href="../.." class="nav-link">Home</a>
                             </li>
-                            <li class="dropdown">
+                            <li class="dropdown active">
                                 <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Usage <b class="caret"></b></a>
                                 <ul class="dropdown-menu">
                                     
 <li>
-    <a href="../../usage/" class="dropdown-item">Overview</a>
+    <a href="../" class="dropdown-item">Overview</a>
 </li>
                                     
 <li>
-    <a href="../../usage/properties/" class="dropdown-item">Properties</a>
+    <a href="../properties/" class="dropdown-item">Properties</a>
 </li>
                                     
 <li>
-    <a href="../../usage/deployment/" class="dropdown-item">Deploying Policies</a>
+    <a href="../deployment/" class="dropdown-item">Deploying Policies</a>
 </li>
                                     
 <li>
-    <a href="../../usage/examples/" class="dropdown-item">Example Policies</a>
+    <a href="./" class="dropdown-item active">Example Policies</a>
 </li>
                                     
 <li>
-    <a href="../../usage/events/" class="dropdown-item">Audit Events</a>
+    <a href="../events/" class="dropdown-item">Audit Events</a>
 </li>
                                 </ul>
                             </li>
-                            <li class="dropdown active">
+                            <li class="dropdown">
                                 <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Technical <b class="caret"></b></a>
                                 <ul class="dropdown-menu">
                                     
 <li>
-    <a href="./" class="dropdown-item active">Threat Model</a>
+    <a href="../../technical/threat-model/" class="dropdown-item">Threat Model</a>
 </li>
                                     
 <li>
-    <a href="../diagrams/" class="dropdown-item">Technical Diagrams</a>
+    <a href="../../technical/diagrams/" class="dropdown-item">Technical Diagrams</a>
 </li>
                                 </ul>
                             </li>
@@ -104,17 +104,17 @@
                             </a>
                         </li>
                             <li class="nav-item">
-                                <a rel="prev" href="../../usage/events/" class="nav-link">
+                                <a rel="prev" href="../deployment/" class="nav-link">
                                     <i class="fa fa-arrow-left"></i> Previous
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a rel="next" href="../diagrams/" class="nav-link">
+                                <a rel="next" href="../events/" class="nav-link">
                                     Next <i class="fa fa-arrow-right"></i>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a href="https://github.com/microsoft/ipe/edit/master/docs/technical/threat-model.md" class="nav-link"><i class="fa fa-github"></i> Edit on GitHub</a>
+                                <a href="https://github.com/microsoft/ipe/edit/master/docs/usage/examples.md" class="nav-link"><i class="fa fa-github"></i> Edit on GitHub</a>
                             </li>
                     </ul>
                 </div>
@@ -134,8 +134,28 @@
     <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
         <ul class="nav flex-column">
             
-            <li class="nav-item" data-level="1"><a href="#threat-model" class="nav-link">Threat Model</a>
+            <li class="nav-item" data-level="1"><a href="#policy-examples" class="nav-link">Policy Examples</a>
               <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#allow-all" class="nav-link">Allow all</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#allow-only-initial-superblock" class="nav-link">Allow only initial superblock</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#allow-any-signed-dm-verity-volume-and-the-initial-superblock" class="nav-link">Allow any signed dm-verity volume and the initial superblock</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#prohibit-execution-from-a-specific-dm-verity-volume" class="nav-link">Prohibit execution from a specific dm-verity volume</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#allow-only-a-specific-dm-verity-volume" class="nav-link">Allow only a specific dm-verity volume</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
               </ul>
             </li>
         </ul>
@@ -143,34 +163,42 @@
 </div></div>
                     <div class="col-md-9" role="main">
 
-<h1 id="threat-model">Threat Model</h1>
-<p>The threat type addressed by IPE is tampering of executable user-land code
-beyond the initially booted kernel, and the initial verification of kernel
-modules that are loaded in userland through <code>modprobe</code> or <code>insmod</code>.</p>
-<p>Tampering violates the property of integrity. IPE's role in mitigating this
-threat is to verify the integrity (and authenticity) of all executable code
-and to deny their use if integrity verification fails. IPE generates audit
-logs which may be utilized to detect integrity verification failures.</p>
-<p>Tampering threat scenarios include modification or replacement of executable
-code by a range of actors including:</p>
-<ul>
-<li>Insiders with physical access to the hardware</li>
-<li>Insiders with local network access to the system</li>
-<li>Insiders with access to the deployment system</li>
-<li>Compromised internal systems under external control</li>
-<li>Malicious end users of the system</li>
-<li>Compromised end users of the system</li>
-<li>Remote (external) compromise of the system</li>
-</ul>
-<p>IPE does not mitigate threats arising from malicious authorized
-developers, or compromised developer tools used by authorized developers.
-Additionally, IPE draws hard security boundary between user mode and
-kernel mode. As a result, IPE does not provide any protections against a
-kernel level exploit, and a kernel-level exploit can disable or tamper with
-IPE's protections.</p>
-<p>The root of trust for all of IPE's verifications is the
-<code>SYSTEM_TRUSTED_KEYRING</code> of the Linux kernel, which is a set of keys that
-are provisioned at kernel build-time.</p></div>
+<h1 id="policy-examples">Policy Examples</h1>
+<h2 id="allow-all">Allow all</h2>
+<pre><code>policy_name=&quot;Allow All&quot; policy_version=0.0.0
+DEFAULT action=ALLOW
+</code></pre>
+
+<h2 id="allow-only-initial-superblock">Allow only initial superblock</h2>
+<pre><code>policy_name=&quot;Allow All Initial SB&quot; policy_version=0.0.0
+DEFAULT action=DENY
+
+op=EXECUTE boot_verified=TRUE action=ALLOW
+</code></pre>
+
+<h2 id="allow-any-signed-dm-verity-volume-and-the-initial-superblock">Allow any signed dm-verity volume and the initial superblock</h2>
+<pre><code>policy_name=&quot;AllowSignedAndInitial&quot; policy_version=0.0.0
+DEFAULT action=DENY
+
+op=EXECUTE boot_verified=TRUE action=ALLOW
+op=EXECUTE dmverity_signature=TRUE action=ALLOW
+</code></pre>
+
+<h2 id="prohibit-execution-from-a-specific-dm-verity-volume">Prohibit execution from a specific dm-verity volume</h2>
+<pre><code>policy_name=&quot;AllowSignedAndInitial&quot; policy_version=0.0.0
+DEFAULT action=DENY
+
+op=EXECUTE dmverity_roothash=401fcec5944823ae12f62726e8184407a5fa9599783f030dec146938 action=DENY
+op=EXECUTE boot_verified=TRUE action=ALLOW
+op=EXECUTE dmverity_signature=TRUE action=ALLOW
+</code></pre>
+
+<h2 id="allow-only-a-specific-dm-verity-volume">Allow only a specific dm-verity volume</h2>
+<pre><code>policy_name=&quot;AllowSignedAndInitial&quot; policy_version=0.0.0
+DEFAULT action=DENY
+
+op=EXECUTE dmverity_roothash=401fcec5944823ae12f62726e8184407a5fa9599783f030dec146938 action=ALLOW
+</code></pre></div>
             </div>
         </div>
 

@@ -6,9 +6,9 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         
         
-        <link rel="canonical" href="https://microsoft.github.io/ipe/policy/properties/">
+        <link rel="canonical" href="https://microsoft.github.io/ipe/usage/deployment/">
         <link rel="shortcut icon" href="../../img/favicon.ico">
-        <title>Properties - Integrity Policy Enforcement</title>
+        <title>Deploying Policies - Integrity Policy Enforcement</title>
         <link href="../../css/bootstrap.min.css" rel="stylesheet">
         <link href="../../css/font-awesome.min.css" rel="stylesheet">
         <link href="../../css/base.css" rel="stylesheet">
@@ -45,11 +45,11 @@
 </li>
                                     
 <li>
-    <a href="./" class="dropdown-item active">Properties</a>
+    <a href="../properties/" class="dropdown-item">Properties</a>
 </li>
                                     
 <li>
-    <a href="../deployment/" class="dropdown-item">Deploying Policies</a>
+    <a href="./" class="dropdown-item active">Deploying Policies</a>
 </li>
                                     
 <li>
@@ -68,16 +68,32 @@
 <li>
     <a href="../../technical/threat-model/" class="dropdown-item">Threat Model</a>
 </li>
+                                    
+<li>
+    <a href="../../technical/diagrams/" class="dropdown-item">Technical Diagrams</a>
+</li>
                                 </ul>
                             </li>
-                            <li class="navitem">
-                                <a href="../../attribution/" class="nav-link">Attribution</a>
-                            </li>
-                            <li class="navitem">
-                                <a href="../../faq/" class="nav-link">FAQ</a>
-                            </li>
-                            <li class="navitem">
-                                <a href="../../license/" class="nav-link">License</a>
+                            <li class="dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Other <b class="caret"></b></a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../faq/" class="dropdown-item">FAQ</a>
+</li>
+                                    
+<li>
+    <a href="../../presentations/" class="dropdown-item">Presentations</a>
+</li>
+                                    
+<li>
+    <a href="../../attribution/" class="dropdown-item">Attribution</a>
+</li>
+                                    
+<li>
+    <a href="../../license/" class="dropdown-item">License</a>
+</li>
+                                </ul>
                             </li>
                         </ul>
 
@@ -88,17 +104,17 @@
                             </a>
                         </li>
                             <li class="nav-item">
-                                <a rel="prev" href="../" class="nav-link">
+                                <a rel="prev" href="../properties/" class="nav-link">
                                     <i class="fa fa-arrow-left"></i> Previous
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a rel="next" href="../deployment/" class="nav-link">
+                                <a rel="next" href="../examples/" class="nav-link">
                                     Next <i class="fa fa-arrow-right"></i>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a href="https://github.com/microsoft/ipe/edit/master/docs/policy/properties.md" class="nav-link"><i class="fa fa-github"></i> Edit on GitHub</a>
+                                <a href="https://github.com/microsoft/ipe/edit/master/docs/usage/deployment.md" class="nav-link"><i class="fa fa-github"></i> Edit on GitHub</a>
                             </li>
                     </ul>
                 </div>
@@ -118,28 +134,18 @@
     <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
         <ul class="nav flex-column">
             
-            <li class="nav-item" data-level="1"><a href="#ipe-properties" class="nav-link">IPE Properties</a>
-              <ul class="nav flex-column">
-            <li class="nav-item" data-level="2"><a href="#op" class="nav-link">op</a>
+            <li class="nav-item" data-level="2"><a href="#deploying-policies" class="nav-link">Deploying Policies</a>
               <ul class="nav flex-column">
               </ul>
             </li>
-            <li class="nav-item" data-level="2"><a href="#action" class="nav-link">action</a>
+            
+            <li class="nav-item" data-level="2"><a href="#activating-policies" class="nav-link">Activating Policies</a>
               <ul class="nav flex-column">
               </ul>
             </li>
-            <li class="nav-item" data-level="2"><a href="#boot_verified" class="nav-link">boot_verified</a>
+            
+            <li class="nav-item" data-level="2"><a href="#deleting-policies" class="nav-link">Deleting Policies</a>
               <ul class="nav flex-column">
-              </ul>
-            </li>
-            <li class="nav-item" data-level="2"><a href="#dmverity_roothash" class="nav-link">dmverity_roothash</a>
-              <ul class="nav flex-column">
-              </ul>
-            </li>
-            <li class="nav-item" data-level="2"><a href="#dmverity_signature" class="nav-link">dmverity_signature</a>
-              <ul class="nav flex-column">
-              </ul>
-            </li>
               </ul>
             </li>
         </ul>
@@ -147,91 +153,71 @@
 </div></div>
                     <div class="col-md-9" role="main">
 
-<h1 id="ipe-properties">IPE Properties</h1>
-<p>IPE properties are <code>key=value</code> pairs expressed in IPE policy.
-These properties can be used in rules within IPE policy to control
-the evaluation of binaries and files on the system IPE is protecting.</p>
-<p>This page contains a listing of all currently supported properties within
-IPE, and a description of the available values for each property.</p>
-<h2 id="op">op</h2>
-<p>Indicates the operation for a rule to apply to. Must be in every rule. IPE
-supports the following operations:</p>
-<p><code>EXECUTE</code></p>
-<blockquote>
-<p>Pertains to any file attempting to be executed, or loaded as an executable.</p>
-</blockquote>
-<p><code>FIRMWARE</code>:</p>
-<blockquote>
-<p>Pertains to firmware being loaded via the firmware_class interface. This
-covers both the preallocated buffer and the firmware file itself.</p>
-</blockquote>
-<p><code>KMODULE</code>:</p>
-<blockquote>
-<p>Pertains to loading kernel modules via <code>modprobe</code> or <code>insmod</code>.</p>
-</blockquote>
-<p><code>KEXEC_IMAGE</code>:</p>
-<blockquote>
-<p>Pertains to kernel images loading via <code>kexec</code>.</p>
-</blockquote>
-<p><code>KEXEC_INITRAMFS</code></p>
-<blockquote>
-<p>Pertains to initrd images loading via <code>kexec --initrd</code>.</p>
-</blockquote>
-<p><code>POLICY</code>:</p>
-<blockquote>
-<p>Controls loading IMA policies through the <code>/sys/kernel/security/ima/policy</code> securityfs entry.</p>
-</blockquote>
-<p><code>X509_CERT</code>:</p>
-<blockquote>
-<p>Controls loading IMA certificates through the Kconfigs, <code>CONFIG_IMA_X509_PATH</code> and <code>CONFIG_EVM_X509_PATH</code>.</p>
-</blockquote>
-<h2 id="action">action</h2>
-<p>Determines what IPE should do when a rule matches. Must be in every rule. Can be one of:</p>
-<p><code>ALLOW</code>:</p>
-<blockquote>
-<p>If the rule matches, explicitly allow the call to proceed without executing any more rules.</p>
-</blockquote>
-<p><code>DENY</code>:</p>
-<blockquote>
-<p>If the rule matches, explicitly prohibit the call from proceeding without
-executing any more rules.</p>
-</blockquote>
-<h2 id="boot_verified">boot_verified</h2>
-<p>This property can be utilized for authorization of the first
-super-block that is mounted on the system, where IPE attempts
-to evaluate a file. Typically this is used for systems with
-an initramfs or other initial disk, where this is unmounted before
-the system becomes available, and is not covered by any other property.
-This property is enabled by the Kconfig, <code>CONFIG_IPE_BOOT_PROP</code>.
-The format of this property is:</p>
-<pre><code>    boot_verified=(TRUE|FALSE)
+<h2 id="deploying-policies">Deploying Policies</h2>
+<p>User policies are policies that are deployed from userland, through securityfs. 
+These policies are signed to enforce some level of authorization of the policies 
+(prohibiting an attacker from gaining root, and deploying an "allow all" policy), 
+through the PKCS#7 enveloped data format. These policies must be signed by a certificate
+that chains to the <code>SYSTEM_TRUSTED_KEYRING</code>. Through openssl, the signing
+can be done via:</p>
+<pre><code>openssl smime -sign -in &quot;$MY_POLICY&quot; -signer &quot;$MY_CERTIFICATE&quot; \
+  -inkey &quot;$MY_PRIVATE_KEY&quot; -binary -outform der -noattr -nodetach \
+  -out &quot;$MY_POLICY.p7s&quot;
 </code></pre>
 
-<blockquote>
-<p>WARNING: This property will trust any disk where the first IPE
-evaluation occurs. If you do not have a startup disk that is
-unpacked and unmounted (like initramfs), then it will automatically
-trust the root filesystem and potentially overauthorize the entire
-disk.</p>
-</blockquote>
-<h2 id="dmverity_roothash">dmverity_roothash</h2>
-<p>This property can be utilized for authorization or revocation of
-specific dm-verity volumes, identified via root hash. It has a
-dependency on the DM_VERITY module. This property is enabled by
-the property: <code>CONFIG_IPE_DM_VERITY_ROOTHASH</code>. The format of this
-property is:</p>
-<pre><code>dmverity_roothash=HashHexDigest
+<p>Deploying the policies is done through securityfs, through the
+<code>new_policy</code> node. To deploy a policy, simply cat the file into the
+securityfs node:</p>
+<pre><code>cat &quot;$MY_POLICY.p7s&quot; &gt; /sys/kernel/security/ipe/new_policy
 </code></pre>
 
-<h2 id="dmverity_signature">dmverity_signature</h2>
-<p>This property can be utilized for authorization of all dm-verity
-volumes that have a signed roothash that chains to the system
-trusted keyring. It has a dependency on the
-<code>DM_VERITY_VERIFY_ROOTHASH_SIG</code> Kconfig. This property is enabled by
-the Kconfig: <code>CONFIG_IPE_DM_VERITY_SIGNATURE</code>.
-The format of this property is:</p>
-<pre><code>dmverity_signature=(TRUE|FALSE)
-</code></pre></div>
+<p>Upon success, this will create one subdirectory under
+<code>/sys/kernel/security/ipe/policies/</code>. The subdirectory will be the
+<code>policy_name</code> field of the policy deployed, so for the example above,
+the directory will be <code>/sys/kernel/security/ipe/policies/Ex\ Policy</code>.
+Within this directory, there will be four files: <code>raw</code>, <code>content</code>,
+<code>active</code>, and <code>delete</code>.</p>
+<p>The <code>raw</code> file is rw, reading will provide the raw PKCS#7 data that
+was provided to the kernel, representing the policy. Writing, will deploy
+an in-place policy update - if this policy is the currently running policy,
+the new updated policy will replace it immediately upon success.</p>
+<p>The <code>content</code> file is read only. Reading will provide the PKCS#7 inner
+content of the policy, which will be the plain text policy.</p>
+<p>The <code>active</code> file is used to set a policy as the currently active policy.
+This file is rw, and accepts a value of <code>"1"</code> to set the policy as active.
+Since only a single policy can be active at one time, all other policies
+will be marked inactive.</p>
+<p>Similarly, the <code>cat</code> command above will result in an error upon
+syntactically invalid or untrusted policies. It will also error if a
+policy already exists with the same <code>policy_name</code>. The write to the <code>raw</code>
+node will error upon syntactically invalid, untrusted policies, or if the
+payload fails the version check. The write will also fail if the
+<code>policy_name</code> in the payload does not match the existing policy.</p>
+<h2 id="activating-policies">Activating Policies</h2>
+<p>Deploying these policies will <em>not</em> cause IPE to start enforcing this
+policy. Once deployment is successful, a policy can be marked as active,
+via <code>/sys/kernel/security/ipe/$policy_name/active</code>. IPE will enforce
+whatever policy is marked as active. For our example, we can activate
+the <code>Ex Policy</code> via:</p>
+<pre><code>   echo -n 1 &gt; &quot;/sys/kernel/security/ipe/Ex Policy/active&quot;
+</code></pre>
+
+<p>At which point, <code>Ex Policy</code> will now be the enforced policy on the
+system.</p>
+<h2 id="deleting-policies">Deleting Policies</h2>
+<p>IPE also provides a way to delete policies. This can be done via the
+<code>delete</code> securityfs node, <code>/sys/kernel/security/ipe/$policy_name/delete</code>.
+Writing <code>1</code> to that file will delete that node:</p>
+<pre><code>   echo -n 1 &gt; &quot;/sys/kernel/security/ipe/$policy_name/delete&quot;
+</code></pre>
+
+<p>There are two requirements to delete policies:</p>
+<ol>
+<li>The policy being deleted must not be the active policy.</li>
+<li>The policy being deleted must not be the boot policy.</li>
+</ol>
+<p>NOTE: If a MAC system is enabled, all writes to ipe's securityfs nodes
+require <code>CAP_MAC_ADMIN</code>.</p></div>
             </div>
         </div>
 
@@ -261,7 +247,7 @@ The format of this property is:</p>
                 </p>
                 <form>
                     <div class="form-group">
-                        <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
                     </div>
                 </form>
                 <div id="mkdocs-search-results"></div>

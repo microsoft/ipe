@@ -6,9 +6,9 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         
         
-        <link rel="canonical" href="https://microsoft.github.io/ipe/technical/threat-model/">
+        <link rel="canonical" href="https://microsoft.github.io/ipe/usage/properties/">
         <link rel="shortcut icon" href="../../img/favicon.ico">
-        <title>Threat Model - Integrity Policy Enforcement</title>
+        <title>Properties - Integrity Policy Enforcement</title>
         <link href="../../css/bootstrap.min.css" rel="stylesheet">
         <link href="../../css/font-awesome.min.css" rel="stylesheet">
         <link href="../../css/base.css" rel="stylesheet">
@@ -36,41 +36,41 @@
                             <li class="navitem">
                                 <a href="../.." class="nav-link">Home</a>
                             </li>
-                            <li class="dropdown">
+                            <li class="dropdown active">
                                 <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Usage <b class="caret"></b></a>
                                 <ul class="dropdown-menu">
                                     
 <li>
-    <a href="../../usage/" class="dropdown-item">Overview</a>
+    <a href="../" class="dropdown-item">Overview</a>
 </li>
                                     
 <li>
-    <a href="../../usage/properties/" class="dropdown-item">Properties</a>
+    <a href="./" class="dropdown-item active">Properties</a>
 </li>
                                     
 <li>
-    <a href="../../usage/deployment/" class="dropdown-item">Deploying Policies</a>
+    <a href="../deployment/" class="dropdown-item">Deploying Policies</a>
 </li>
                                     
 <li>
-    <a href="../../usage/examples/" class="dropdown-item">Example Policies</a>
+    <a href="../examples/" class="dropdown-item">Example Policies</a>
 </li>
                                     
 <li>
-    <a href="../../usage/events/" class="dropdown-item">Audit Events</a>
+    <a href="../events/" class="dropdown-item">Audit Events</a>
 </li>
                                 </ul>
                             </li>
-                            <li class="dropdown active">
+                            <li class="dropdown">
                                 <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Technical <b class="caret"></b></a>
                                 <ul class="dropdown-menu">
                                     
 <li>
-    <a href="./" class="dropdown-item active">Threat Model</a>
+    <a href="../../technical/threat-model/" class="dropdown-item">Threat Model</a>
 </li>
                                     
 <li>
-    <a href="../diagrams/" class="dropdown-item">Technical Diagrams</a>
+    <a href="../../technical/diagrams/" class="dropdown-item">Technical Diagrams</a>
 </li>
                                 </ul>
                             </li>
@@ -104,17 +104,17 @@
                             </a>
                         </li>
                             <li class="nav-item">
-                                <a rel="prev" href="../../usage/events/" class="nav-link">
+                                <a rel="prev" href="../" class="nav-link">
                                     <i class="fa fa-arrow-left"></i> Previous
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a rel="next" href="../diagrams/" class="nav-link">
+                                <a rel="next" href="../deployment/" class="nav-link">
                                     Next <i class="fa fa-arrow-right"></i>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a href="https://github.com/microsoft/ipe/edit/master/docs/technical/threat-model.md" class="nav-link"><i class="fa fa-github"></i> Edit on GitHub</a>
+                                <a href="https://github.com/microsoft/ipe/edit/master/docs/usage/properties.md" class="nav-link"><i class="fa fa-github"></i> Edit on GitHub</a>
                             </li>
                     </ul>
                 </div>
@@ -134,8 +134,28 @@
     <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
         <ul class="nav flex-column">
             
-            <li class="nav-item" data-level="1"><a href="#threat-model" class="nav-link">Threat Model</a>
+            <li class="nav-item" data-level="1"><a href="#ipe-properties" class="nav-link">IPE Properties</a>
               <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#op" class="nav-link">op</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#action" class="nav-link">action</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#boot_verified" class="nav-link">boot_verified</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#dmverity_roothash" class="nav-link">dmverity_roothash</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#dmverity_signature" class="nav-link">dmverity_signature</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
               </ul>
             </li>
         </ul>
@@ -143,34 +163,114 @@
 </div></div>
                     <div class="col-md-9" role="main">
 
-<h1 id="threat-model">Threat Model</h1>
-<p>The threat type addressed by IPE is tampering of executable user-land code
-beyond the initially booted kernel, and the initial verification of kernel
-modules that are loaded in userland through <code>modprobe</code> or <code>insmod</code>.</p>
-<p>Tampering violates the property of integrity. IPE's role in mitigating this
-threat is to verify the integrity (and authenticity) of all executable code
-and to deny their use if integrity verification fails. IPE generates audit
-logs which may be utilized to detect integrity verification failures.</p>
-<p>Tampering threat scenarios include modification or replacement of executable
-code by a range of actors including:</p>
-<ul>
-<li>Insiders with physical access to the hardware</li>
-<li>Insiders with local network access to the system</li>
-<li>Insiders with access to the deployment system</li>
-<li>Compromised internal systems under external control</li>
-<li>Malicious end users of the system</li>
-<li>Compromised end users of the system</li>
-<li>Remote (external) compromise of the system</li>
-</ul>
-<p>IPE does not mitigate threats arising from malicious authorized
-developers, or compromised developer tools used by authorized developers.
-Additionally, IPE draws hard security boundary between user mode and
-kernel mode. As a result, IPE does not provide any protections against a
-kernel level exploit, and a kernel-level exploit can disable or tamper with
-IPE's protections.</p>
-<p>The root of trust for all of IPE's verifications is the
-<code>SYSTEM_TRUSTED_KEYRING</code> of the Linux kernel, which is a set of keys that
-are provisioned at kernel build-time.</p></div>
+<h1 id="ipe-properties">IPE Properties</h1>
+<p>IPE properties are <code>key=value</code> pairs expressed in IPE policy.
+These properties can be used in rules within IPE policy to control
+the evaluation of binaries and files on the system IPE is protecting.</p>
+<p>This page contains a listing of all currently supported properties within
+IPE, and a description of the available values for each property.</p>
+<p>Usermode can interrogate the kernel via <code>/sys/kernel/security/ipe/property_config</code>
+which, when read, will return a string of form:</p>
+<pre><code>Property1=Version1
+Property2=Version2
+.
+.
+.
+PropertyN=VersionN
+</code></pre>
+
+<p>For all properties that IPE is configured to understand.</p>
+<h2 id="op">op</h2>
+<h3 id="version-1">Version 1</h3>
+<p>Indicates the operation for a rule to apply to. Must be in every rule. IPE
+supports the following operations:</p>
+<p><code>EXECUTE</code></p>
+<blockquote>
+<p>Pertains to any file attempting to be executed, or loaded as an executable.</p>
+</blockquote>
+<p><code>FIRMWARE</code>:</p>
+<blockquote>
+<p>Pertains to firmware being loaded via the firmware_class interface. This
+covers both the preallocated buffer and the firmware file itself.</p>
+</blockquote>
+<p><code>KMODULE</code>:</p>
+<blockquote>
+<p>Pertains to loading kernel modules via <code>modprobe</code> or <code>insmod</code>.</p>
+</blockquote>
+<p><code>KEXEC_IMAGE</code>:</p>
+<blockquote>
+<p>Pertains to kernel images loading via <code>kexec</code>.</p>
+</blockquote>
+<p><code>KEXEC_INITRAMFS</code></p>
+<blockquote>
+<p>Pertains to initrd images loading via <code>kexec --initrd</code>.</p>
+</blockquote>
+<p><code>POLICY</code>:</p>
+<blockquote>
+<p>Controls loading IMA policies through the <code>/sys/kernel/security/ima/policy</code>
+securityfs entry.</p>
+</blockquote>
+<p><code>X509_CERT</code>:</p>
+<blockquote>
+<p>Controls loading IMA certificates through the Kconfigs, <code>CONFIG_IMA_X509_PATH</code>
+and <code>CONFIG_EVM_X509_PATH</code>.</p>
+</blockquote>
+<p><code>KERNEL_READ</code>:</p>
+<blockquote>
+<p>Short-hand for the following operations: <code>FIRMWARE</code>, <code>KMODULE</code>,
+<code>KEXEC_IMAGE</code>, <code>KEXEC_INITRAMFS</code>, <code>POLICY</code>, and <code>X509_CERTIFICATE</code></p>
+</blockquote>
+<h2 id="action">action</h2>
+<h3 id="version-1_1">Version 1</h3>
+<p>Determines what IPE should do when a rule matches. Must be in every rule. Can be one of:</p>
+<p><code>ALLOW</code>:</p>
+<blockquote>
+<p>If the rule matches, explicitly allow the call to proceed without executing any more rules.</p>
+</blockquote>
+<p><code>DENY</code>:</p>
+<blockquote>
+<p>If the rule matches, explicitly prohibit the call from proceeding without
+executing any more rules.</p>
+</blockquote>
+<h2 id="boot_verified">boot_verified</h2>
+<h3 id="version-1_2">Version 1</h3>
+<p>This property can be utilized for authorization of the first
+super-block that is mounted on the system, where IPE attempts
+to evaluate a file. Typically this is used for systems with
+an initramfs or other initial disk, where this is unmounted before
+the system becomes available, and is not covered by any other property.
+This property is enabled by the Kconfig, <code>CONFIG_IPE_BOOT_PROP</code>.
+The format of this property is:</p>
+<pre><code>    boot_verified=(TRUE|FALSE)
+</code></pre>
+
+<blockquote>
+<p>WARNING: This property will trust any disk where the first IPE
+evaluation occurs. If you do not have a startup disk that is
+unpacked and unmounted (like initramfs), then it will automatically
+trust the root filesystem and potentially overauthorize the entire
+disk.</p>
+</blockquote>
+<h2 id="dmverity_roothash">dmverity_roothash</h2>
+<h3 id="version-1_3">Version 1</h3>
+<p>This property can be utilized for authorization or revocation of
+specific dm-verity volumes, identified via root hash. It has a
+dependency on the DM_VERITY module. This property is enabled by
+the property: <code>CONFIG_IPE_DM_VERITY_ROOTHASH</code>. The format of this
+property is:</p>
+<pre><code>dmverity_roothash=HashHexDigest
+</code></pre>
+
+<h2 id="dmverity_signature">dmverity_signature</h2>
+<h3 id="version-1_4">Version 1</h3>
+<p>This property can be utilized for authorization of all dm-verity
+volumes that have a signed roothash that chains to the system
+trusted keyring. It has a dependency on the
+<code>DM_VERITY_VERIFY_ROOTHASH_SIG</code> Kconfig. This property is enabled by
+the Kconfig: <code>CONFIG_IPE_DM_VERITY_SIGNATURE</code>.
+The format of this property is:</p>
+<pre><code>dmverity_signature=(TRUE|FALSE)
+</code></pre></div>
             </div>
         </div>
 

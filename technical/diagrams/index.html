@@ -6,9 +6,9 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         
         
-        <link rel="canonical" href="https://microsoft.github.io/ipe/policy/examples/">
+        <link rel="canonical" href="https://microsoft.github.io/ipe/technical/diagrams/">
         <link rel="shortcut icon" href="../../img/favicon.ico">
-        <title>Example Policies - Integrity Policy Enforcement</title>
+        <title>Technical Diagrams - Integrity Policy Enforcement</title>
         <link href="../../css/bootstrap.min.css" rel="stylesheet">
         <link href="../../css/font-awesome.min.css" rel="stylesheet">
         <link href="../../css/base.css" rel="stylesheet">
@@ -36,48 +36,64 @@
                             <li class="navitem">
                                 <a href="../.." class="nav-link">Home</a>
                             </li>
-                            <li class="dropdown active">
+                            <li class="dropdown">
                                 <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Usage <b class="caret"></b></a>
                                 <ul class="dropdown-menu">
                                     
 <li>
-    <a href="../" class="dropdown-item">Overview</a>
+    <a href="../../usage/" class="dropdown-item">Overview</a>
 </li>
                                     
 <li>
-    <a href="../properties/" class="dropdown-item">Properties</a>
+    <a href="../../usage/properties/" class="dropdown-item">Properties</a>
 </li>
                                     
 <li>
-    <a href="../deployment/" class="dropdown-item">Deploying Policies</a>
+    <a href="../../usage/deployment/" class="dropdown-item">Deploying Policies</a>
 </li>
                                     
 <li>
-    <a href="./" class="dropdown-item active">Example Policies</a>
+    <a href="../../usage/examples/" class="dropdown-item">Example Policies</a>
 </li>
                                     
 <li>
-    <a href="../events/" class="dropdown-item">Audit Events</a>
+    <a href="../../usage/events/" class="dropdown-item">Audit Events</a>
 </li>
                                 </ul>
                             </li>
-                            <li class="dropdown">
+                            <li class="dropdown active">
                                 <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Technical <b class="caret"></b></a>
                                 <ul class="dropdown-menu">
                                     
 <li>
-    <a href="../../technical/threat-model/" class="dropdown-item">Threat Model</a>
+    <a href="../threat-model/" class="dropdown-item">Threat Model</a>
+</li>
+                                    
+<li>
+    <a href="./" class="dropdown-item active">Technical Diagrams</a>
 </li>
                                 </ul>
                             </li>
-                            <li class="navitem">
-                                <a href="../../attribution/" class="nav-link">Attribution</a>
-                            </li>
-                            <li class="navitem">
-                                <a href="../../faq/" class="nav-link">FAQ</a>
-                            </li>
-                            <li class="navitem">
-                                <a href="../../license/" class="nav-link">License</a>
+                            <li class="dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Other <b class="caret"></b></a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../faq/" class="dropdown-item">FAQ</a>
+</li>
+                                    
+<li>
+    <a href="../../presentations/" class="dropdown-item">Presentations</a>
+</li>
+                                    
+<li>
+    <a href="../../attribution/" class="dropdown-item">Attribution</a>
+</li>
+                                    
+<li>
+    <a href="../../license/" class="dropdown-item">License</a>
+</li>
+                                </ul>
                             </li>
                         </ul>
 
@@ -88,17 +104,17 @@
                             </a>
                         </li>
                             <li class="nav-item">
-                                <a rel="prev" href="../deployment/" class="nav-link">
+                                <a rel="prev" href="../threat-model/" class="nav-link">
                                     <i class="fa fa-arrow-left"></i> Previous
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a rel="next" href="../events/" class="nav-link">
+                                <a rel="next" href="../../faq/" class="nav-link">
                                     Next <i class="fa fa-arrow-right"></i>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a href="https://github.com/microsoft/ipe/edit/master/docs/policy/examples.md" class="nav-link"><i class="fa fa-github"></i> Edit on GitHub</a>
+                                <a href="https://github.com/microsoft/ipe/edit/master/docs/technical/diagrams.md" class="nav-link"><i class="fa fa-github"></i> Edit on GitHub</a>
                             </li>
                     </ul>
                 </div>
@@ -118,25 +134,21 @@
     <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
         <ul class="nav flex-column">
             
-            <li class="nav-item" data-level="1"><a href="#policy-examples" class="nav-link">Policy Examples</a>
+            <li class="nav-item" data-level="1"><a href="#technical-diagrams" class="nav-link">Technical Diagrams</a>
               <ul class="nav flex-column">
-            <li class="nav-item" data-level="2"><a href="#allow-all" class="nav-link">Allow all</a>
-              <ul class="nav flex-column">
-              </ul>
-            </li>
-            <li class="nav-item" data-level="2"><a href="#allow-only-initial-superblock" class="nav-link">Allow only initial superblock</a>
+            <li class="nav-item" data-level="2"><a href="#high-level-architectural" class="nav-link">High-Level Architectural</a>
               <ul class="nav flex-column">
               </ul>
             </li>
-            <li class="nav-item" data-level="2"><a href="#allow-any-signed-dm-verity-volume-and-the-initial-superblock" class="nav-link">Allow any signed dm-verity volume and the initial superblock</a>
+            <li class="nav-item" data-level="2"><a href="#common-workflows" class="nav-link">Common Workflows</a>
               <ul class="nav flex-column">
               </ul>
             </li>
-            <li class="nav-item" data-level="2"><a href="#prohibit-execution-from-a-specific-dm-verity-volume" class="nav-link">Prohibit execution from a specific dm-verity volume</a>
+            <li class="nav-item" data-level="2"><a href="#policy-operations" class="nav-link">Policy Operations</a>
               <ul class="nav flex-column">
               </ul>
             </li>
-            <li class="nav-item" data-level="2"><a href="#allow-only-a-specific-dm-verity-volume" class="nav-link">Allow only a specific dm-verity volume</a>
+            <li class="nav-item" data-level="2"><a href="#evaluation" class="nav-link">Evaluation</a>
               <ul class="nav flex-column">
               </ul>
             </li>
@@ -147,42 +159,25 @@
 </div></div>
                     <div class="col-md-9" role="main">
 
-<h1 id="policy-examples">Policy Examples</h1>
-<h2 id="allow-all">Allow all</h2>
-<pre><code>policy_name=&quot;Allow All&quot; policy_version=0.0.0
-DEFAULT action=ALLOW
-</code></pre>
-
-<h2 id="allow-only-initial-superblock">Allow only initial superblock</h2>
-<pre><code>policy_name=&quot;Allow All Initial SB&quot; policy_version=0.0.0
-DEFAULT action=DENY
-
-op=EXECUTE boot_verified=TRUE action=ALLOW
-</code></pre>
-
-<h2 id="allow-any-signed-dm-verity-volume-and-the-initial-superblock">Allow any signed dm-verity volume and the initial superblock</h2>
-<pre><code>policy_name=&quot;AllowSignedAndInitial&quot; policy_version=0.0.0
-DEFAULT action=DENY
-
-op=EXECUTE boot_verified=TRUE action=ALLOW
-op=EXECUTE dmverity_signature=TRUE action=ALLOW
-</code></pre>
-
-<h2 id="prohibit-execution-from-a-specific-dm-verity-volume">Prohibit execution from a specific dm-verity volume</h2>
-<pre><code>policy_name=&quot;AllowSignedAndInitial&quot; policy_version=0.0.0
-DEFAULT action=DENY
-
-op=EXECUTE dmverity_roothash=401fcec5944823ae12f62726e8184407a5fa9599783f030dec146938 action=DENY
-op=EXECUTE boot_verified=TRUE action=ALLOW
-op=EXECUTE dmverity_signature=TRUE action=ALLOW
-</code></pre>
-
-<h2 id="allow-only-a-specific-dm-verity-volume">Allow only a specific dm-verity volume</h2>
-<pre><code>policy_name=&quot;AllowSignedAndInitial&quot; policy_version=0.0.0
-DEFAULT action=DENY
-
-op=EXECUTE dmverity_roothash=401fcec5944823ae12f62726e8184407a5fa9599783f030dec146938 action=ALLOW
-</code></pre></div>
+<h1 id="technical-diagrams">Technical Diagrams</h1>
+<p>Left click on any image to view an image in it's original resolution.
+As these are SVGs, they will be significantly easier to read when enlarged.</p>
+<h2 id="high-level-architectural">High-Level Architectural</h2>
+<p><a href="/assets/diagrams/HighLevel.svg"><img alt="IPE High Level Architectural Diagram" src="/assets/diagrams/HighLevel.svg" /></a></p>
+<h2 id="common-workflows">Common Workflows</h2>
+<h3 id="parse-policy">Parse Policy</h3>
+<p><a href="/assets/diagrams/CommonParse.svg"><img alt="IPE Common Parse Flowchart" src="/assets/diagrams/CommonParse.svg" /></a></p>
+<h2 id="policy-operations">Policy Operations</h2>
+<h3 id="new-policy">New Policy</h3>
+<p><a href="/assets/diagrams/NewPolicy.svg"><img alt="IPE New Policy Flowchart" src="/assets/diagrams/NewPolicy.svg" /></a></p>
+<h3 id="update">Update</h3>
+<p><a href="/assets/diagrams/Update.svg"><img alt="IPE Update Policy Flowchart" src="/assets/diagrams/Update.svg" /></a></p>
+<h3 id="delete">Delete</h3>
+<p><a href="/assets/diagrams/Delete.svg"><img alt="IPE Delete Flowchart" src="/assets/diagrams/Delete.svg" /></a></p>
+<h3 id="activation">Activation</h3>
+<p><a href="/assets/diagrams/Activate.svg"><img alt="IPE Activate Policy Flowchart" src="/assets/diagrams/Activate.svg" /></a></p>
+<h2 id="evaluation">Evaluation</h2>
+<p><a href="/assets/diagrams/Evaluate.svg"><img alt="IPE Evaluation Flowchart" src="/assets/diagrams/Evaluate.svg" /></a></p></div>
             </div>
         </div>
 
@@ -212,7 +207,7 @@ op=EXECUTE dmverity_roothash=401fcec5944823ae12f62726e8184407a5fa9599783f030dec1
                 </p>
                 <form>
                     <div class="form-group">
-                        <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
                     </div>
                 </form>
                 <div id="mkdocs-search-results"></div>
