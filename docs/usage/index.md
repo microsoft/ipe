@@ -56,9 +56,10 @@ DEFAULT action=ALLOW
 DEFAULT op=EXECUTE action=ALLOW
 ```
 
-If a global default is unset, and a specific operation default is not set
-for an IPE operation, it will assume that the default action should be `ALLOW`.
-This is to preserve compatibility between policies and the LSM.
+A DEFAULT operation must be set for all understood
+operations within IPE. For policies to remain completely forwards
+compatible, it is recommended that users add a `DEFAULT action=ALLOW`
+and override the defaults on a per-operation basis.
 
 ## Early user-mode protection
 
@@ -90,6 +91,6 @@ and logs policy violations, but will not enforce the policy. This allows
 users to test policies before enforcing them.
 
 The default mode is enforce, and can be changed via the kernel command line
-parameter `ipe.enforce=(0|1)`, or the sysctl `ipe.enforce=(0|1)`. The
-ability to switch modes can be compiled out of the LSM via setting the
-Kconfig `CONFIG_SECURITY_IPE_PERMISSIVE_SWITCH` to N.
+parameter `ipe.enforce=(0|1)`, or the securityfs node,
+`/sys/kernel/security/ipe/enforce`. The ability to switch modes can be compiled
+out of the LSM via setting the Kconfig `CONFIG_SECURITY_IPE_PERMISSIVE_SWITCH` to N.

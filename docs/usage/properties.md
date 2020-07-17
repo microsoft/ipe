@@ -7,7 +7,23 @@ the evaluation of binaries and files on the system IPE is protecting.
 This page contains a listing of all currently supported properties within
 IPE, and a description of the available values for each property.
 
+Usermode can interrogate the kernel via `/sys/kernel/security/ipe/property_config`
+which, when read, will return a string of form:
+
+```
+Property1=Version1
+Property2=Version2
+.
+.
+.
+PropertyN=VersionN
+```
+
+For all properties that IPE is configured to understand.
+
 ## op
+
+### Version 1
 
 Indicates the operation for a rule to apply to. Must be in every rule. IPE
 supports the following operations:
@@ -42,6 +58,8 @@ supports the following operations:
 
 ## action
 
+### Version 1
+
 Determines what IPE should do when a rule matches. Must be in every rule. Can be one of:
 
 `ALLOW`:
@@ -53,6 +71,8 @@ executing any more rules.
 
 
 ## boot_verified
+
+### Version 1
 
 This property can be utilized for authorization of the first
 super-block that is mounted on the system, where IPE attempts
@@ -74,6 +94,8 @@ The format of this property is:
 
 ## dmverity_roothash
 
+### Version 1
+
 This property can be utilized for authorization or revocation of
 specific dm-verity volumes, identified via root hash. It has a
 dependency on the DM_VERITY module. This property is enabled by
@@ -85,6 +107,8 @@ dmverity_roothash=HashHexDigest
 ```
 
 ## dmverity_signature
+
+### Version 1
 
 This property can be utilized for authorization of all dm-verity
 volumes that have a signed roothash that chains to the system

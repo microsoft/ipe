@@ -23,9 +23,10 @@ cat "$MY_POLICY.p7s" > /sys/kernel/security/ipe/new_policy
 
 Upon success, this will create one subdirectory under
 `/sys/kernel/security/ipe/policies/`. The subdirectory will be the
-`policy_name` field of the policy deployed, so for the example above, the
-directory will be `/sys/kernel/security/ipe/policies/Ex\ Policy`. Within
-this directory, there will be two files: `raw` and `content`. 
+`policy_name` field of the policy deployed, so for the example above,
+the directory will be `/sys/kernel/security/ipe/policies/Ex\ Policy`.
+Within this directory, there will be four files: `raw`, `content`,
+`active`, and `delete`.
 
 The `raw` file is rw, reading will provide the raw PKCS#7 data that
 was provided to the kernel, representing the policy. Writing, will deploy
@@ -34,6 +35,11 @@ the new updated policy will replace it immediately upon success.
 
 The `content` file is read only. Reading will provide the PKCS#7 inner
 content of the policy, which will be the plain text policy.
+
+The `active` file is used to set a policy as the currently active policy.
+This file is rw, and accepts a value of `"1"` to set the policy as active.
+Since only a single policy can be active at one time, all other policies
+will be marked inactive.
 
 Similarly, the `cat` command above will result in an error upon
 syntactically invalid or untrusted policies. It will also error if a
@@ -44,26 +50,27 @@ payload fails the version check. The write will also fail if the
 
 ## Activating Policies
 
-Deploying these policies will _not_ cause IPE to start enforcing this
+Deploying these policies will *not* cause IPE to start enforcing this
 policy. Once deployment is successful, a policy can be marked as active,
-via the sysctl, `ipe.active_policy`. IPE will enforce whatever policy is
-marked as active. For our example, we can activate the `Ex Policy` via:
+via `/sys/kernel/security/ipe/$policy_name/active`. IPE will enforce
+whatever policy is marked as active. For our example, we can activate
+the `Ex Policy` via:
 
 ```
-sysctl ipe.active_policy="Ex Policy"
+   echo -n 1 > "/sys/kernel/security/ipe/Ex Policy/active"
 ```
 
-At which point, `Ex Policy` will now be the enforced policy on the system.
+At which point, `Ex Policy` will now be the enforced policy on the
+system.
 
 ## Deleting Policies
 
 IPE also provides a way to delete policies. This can be done via the
-`del_policy` securityfs node, `/sys/kernel/security/ipe/del_policy`.
-Writing the `policy_name` of the policy to be deleted will delete that
-node: 
+`delete` securityfs node, `/sys/kernel/security/ipe/$policy_name/delete`.
+Writing `1` to that file will delete that node:
 
 ```
-echo -n "$MY_POLICY_NAME" > /sys/kernel/security/ipe/del_policy
+   echo -n 1 > "/sys/kernel/security/ipe/$policy_name/delete"
 ```
 
 There are two requirements to delete policies:
@@ -71,6 +78,5 @@ There are two requirements to delete policies:
 1. The policy being deleted must not be the active policy.
 2. The policy being deleted must not be the boot policy.
 
-NOTE: It's important to know above that the "echo" command will add a
-newline to the end of the input, and this will be considered as part of the
-filename. You can remove the newline via the -n parameter.
+NOTE: If a MAC system is enabled, all writes to ipe's securityfs nodes
+require `CAP_MAC_ADMIN`.

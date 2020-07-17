@@ -27,7 +27,8 @@ on the system.
 AUDIT1809 IPE policy_name="AllowAll" policy_version=0.0.0
 ```
 
-This event is emitted when a policy is activated via `sysctl ipe.active_policy`
+This event is emitted when a policy is activated via the securityfs node,
+`/sys/kernel/security/ipe/policies/$policy_name/active`
 or when a policy is activated in place via
 `$SECURITYFS/ipe/policies/<policy_name>/raw`. It is emitted to the audit
 channel, and can be used to provide a record of when policies were made active.
@@ -91,7 +92,7 @@ will only emit the parsed version.
 <sup>2</sup> IPE supports success auditing. When enabled, all events that pass IPE 
 policy and are not blocked will emit an audit event. This is disabled by 
 default, and can be enabled via the kernel command line
-`ipe.success_audit=(0|1)` or the sysctl `ipe.success_audit=(0|1)`.
+`ipe.success_audit=(0|1)` or the securityfs node, `/sys/kernel/security/ipe/success_audit`
 
 This is very noisy, as IPE will check every user-mode binary on the system,
 but is useful for debugging policies.
