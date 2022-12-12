@@ -259,3 +259,31 @@ err:
 	return 0;
 }
 #endif /* CONFIG_IPE_PROP_DM_VERITY */
+
+#ifdef CONFIG_IPE_PROP_FS_VERITY
+/**
+ * ipe_inode_setintegrity - save integrity data from a inode to IPE's LSM blob.
+ * @inode: The inode to source the security blob from.
+ * @type: Supplies the integrity type.
+ * @value: The value to be stored.
+ * @size: The size of @value.
+ *
+ * Saves fsverity signature into inode security blob
+ *
+ * Return:
+ * * 0	- OK
+ * * !0	- Error
+ */
+int ipe_inode_setintegrity(struct inode *inode, enum lsm_integrity_type type,
+			   const void *value, size_t size)
+{
+	struct ipe_inode *inode_sec = ipe_inode(inode);
+
+	if (type == LSM_INT_FSVERITY_BUILTINSIG) {
+		inode_sec->fs_verity_signed = size > 0 && value;
+		return 0;
+	}
+
+	return 0;
+}
+#endif /* CONFIG_CONFIG_IPE_PROP_FS_VERITY */
