@@ -8,3 +8,5 @@
 obj-$(CONFIG_SECURITY_IPE) += \
 	hooks.o \
 	ipe.o \
+	policy.o \
+	policy_parser.o \
