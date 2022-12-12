@@ -8,6 +8,7 @@
 #include <linux/fs.h>
 #include <linux/binfmts.h>
 #include <linux/security.h>
+#include <linux/blk_types.h>
 
 enum ipe_hook_type {
 	IPE_HOOK_BPRM_CHECK = 0,
@@ -36,5 +37,12 @@ int ipe_kernel_load_data(enum kernel_load_data_id id, bool contents);
 #ifdef CONFIG_BLK_DEV_INITRD
 void ipe_unpack_initramfs(void);
 #endif /* CONFIG_BLK_DEV_INITRD */
+
+#ifdef CONFIG_IPE_PROP_DM_VERITY
+void ipe_bdev_free_security(struct block_device *bdev);
+
+int ipe_bdev_setsecurity(struct block_device *bdev, const char *key,
+			 const void *value, size_t len);
+#endif /* CONFIG_IPE_PROP_DM_VERITY */
 
 #endif /* _IPE_HOOKS_H */

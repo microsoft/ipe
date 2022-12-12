@@ -7,6 +7,7 @@
 #include "ipe.h"
 #include "eval.h"
 #include "hooks.h"
+#include "eval.h"
 
 bool ipe_enabled;
 
@@ -14,6 +15,9 @@ static struct lsm_blob_sizes ipe_blobs __ro_after_init = {
 #ifdef CONFIG_BLK_DEV_INITRD
 	.lbs_superblock = sizeof(struct ipe_sb),
 #endif /* CONFIG_BLK_DEV_INITRD */
+#ifdef CONFIG_IPE_PROP_DM_VERITY
+	.lbs_bdev = sizeof(struct ipe_bdev),
+#endif /* CONFIG_IPE_PROP_DM_VERITY */
 };
 
 static const struct lsm_id ipe_lsmid = {
@@ -28,6 +32,13 @@ struct ipe_sb *ipe_sb(const struct super_block *sb)
 }
 #endif /* CONFIG_BLK_DEV_INITRD */
 
+#ifdef CONFIG_IPE_PROP_DM_VERITY
+struct ipe_bdev *ipe_bdev(struct block_device *b)
+{
+	return b->security + ipe_blobs.lbs_bdev;
+}
+#endif /* CONFIG_IPE_PROP_DM_VERITY */
+
 static struct security_hook_list ipe_hooks[] __ro_after_init = {
 	LSM_HOOK_INIT(bprm_check_security, ipe_bprm_check_security),
 	LSM_HOOK_INIT(mmap_file, ipe_mmap_file),
@@ -37,6 +48,10 @@ static struct security_hook_list ipe_hooks[] __ro_after_init = {
 #ifdef CONFIG_BLK_DEV_INITRD
 	LSM_HOOK_INIT(unpack_initramfs_security, ipe_unpack_initramfs),
 #endif /* CONFIG_BLK_DEV_INITRD */
+#ifdef CONFIG_IPE_PROP_DM_VERITY
+	LSM_HOOK_INIT(bdev_free_security, ipe_bdev_free_security),
+	LSM_HOOK_INIT(bdev_setsecurity, ipe_bdev_setsecurity),
+#endif /* CONFIG_IPE_PROP_DM_VERITY */
 };
 
 /**

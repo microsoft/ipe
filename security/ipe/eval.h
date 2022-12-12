@@ -24,6 +24,13 @@ struct ipe_sb {
 };
 #endif /* CONFIG_BLK_DEV_INITRD */
 
+#ifdef CONFIG_IPE_PROP_DM_VERITY
+struct ipe_bdev {
+	bool dm_verity_signed;
+	struct digest_info *root_hash;
+};
+#endif /* CONFIG_IPE_PROP_DM_VERITY */
+
 struct ipe_eval_ctx {
 	enum ipe_op_type op;
 	enum ipe_hook_type hook;
@@ -32,6 +39,9 @@ struct ipe_eval_ctx {
 #ifdef CONFIG_BLK_DEV_INITRD
 	bool from_initramfs;
 #endif /* CONFIG_BLK_DEV_INITRD */
+#ifdef CONFIG_IPE_PROP_DM_VERITY
+	const struct ipe_bdev *ipe_bdev;
+#endif /* CONFIG_IPE_PROP_DM_VERITY */
 };
 
 enum ipe_match {
