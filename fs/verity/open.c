@@ -8,6 +8,7 @@
 #include "fsverity_private.h"
 
 #include <linux/mm.h>
+#include <linux/security.h>
 #include <linux/slab.h>
 
 static struct kmem_cache *fsverity_info_cachep;
@@ -172,12 +173,28 @@ static int compute_file_digest(const struct fsverity_hash_alg *hash_alg,
 	return err;
 }
 
+#ifdef CONFIG_FS_VERITY_BUILTIN_SIGNATURES
+static int fsverity_inode_setsecurity(struct inode *inode,
+				      const struct fsverity_descriptor *desc)
+{
+	return security_inode_setsecurity(inode, FS_VERITY_INODE_SEC_NAME,
+					  desc->signature,
+					  le32_to_cpu(desc->sig_size), 0);
+}
+#else
+static inline int fsverity_inode_setsecurity(struct inode *inode,
+					     const struct fsverity_descriptor *desc)
+{
+	return 0;
+}
+#endif /* CONFIG_IPE_PROP_FS_VERITY*/
+
 /*
  * Create a new fsverity_info from the given fsverity_descriptor (with optional
  * appended builtin signature), and check the signature if present.  The
  * fsverity_descriptor must have already undergone basic validation.
  */
-struct fsverity_info *fsverity_create_info(const struct inode *inode,
+struct fsverity_info *fsverity_create_info(struct inode *inode,
 					   struct fsverity_descriptor *desc)
 {
 	struct fsverity_info *vi;
@@ -241,6 +258,13 @@ struct fsverity_info *fsverity_create_info(const struct inode *inode,
 		}
 		spin_lock_init(&vi->hash_page_init_lock);
 	}
+
+	err = fsverity_inode_setsecurity(inode, desc);
+	if (err == -EOPNOTSUPP)
+		err = 0;
+
+	if (err)
+		goto fail;
 
 	return vi;
 
