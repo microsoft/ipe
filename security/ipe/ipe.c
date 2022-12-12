@@ -6,6 +6,8 @@
 #include "ipe.h"
 #include "hooks.h"
 
+bool ipe_enabled;
+
 static struct lsm_blob_sizes ipe_blobs __ro_after_init = {
 };
 
@@ -33,6 +35,7 @@ static int __init ipe_init(void)
 	int rc = 0;
 
 	security_add_hooks(ipe_hooks, ARRAY_SIZE(ipe_hooks), "ipe");
+	ipe_enabled = true;
 
 	return rc;
 }

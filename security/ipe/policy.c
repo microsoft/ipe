@@ -7,8 +7,35 @@
 #include <linux/verification.h>
 
 #include "ipe.h"
+#include "eval.h"
+#include "fs.h"
 #include "policy.h"
 #include "policy_parser.h"
+
+/* lock for synchronizing writers across ipe policy */
+DEFINE_MUTEX(ipe_policy_lock);
+
+/**
+ * ver_to_u64 - Convert an internal ipe_policy_version to a u64.
+ * @p: Policy to extract the version from.
+ *
+ * Bits (LSB is index 0):
+ *	[48,32] -> Major
+ *	[32,16] -> Minor
+ *	[16, 0] -> Revision
+ *
+ * Return: u64 version of the embedded version structure.
+ */
+static inline u64 ver_to_u64(const struct ipe_policy *const p)
+{
+	u64 r;
+
+	r = (((u64)p->parsed->version.major) << 32)
+	  | (((u64)p->parsed->version.minor) << 16)
+	  | ((u64)(p->parsed->version.rev));
+
+	return r;
+}
 
 /**
  * ipe_free_policy - Deallocate a given IPE policy.
@@ -21,6 +48,7 @@ void ipe_free_policy(struct ipe_policy *p)
 	if (IS_ERR_OR_NULL(p))
 		return;
 
+	ipe_del_policyfs_node(p);
 	free_parsed_policy(p->parsed);
 	if (!p->pkcs7)
 		kfree(p->text);
@@ -37,6 +65,65 @@ static int set_pkcs7_data(void *ctx, const void *data, size_t len,
 	p->textlen = len;
 
 	return 0;
+}
+
+/**
+ * ipe_update_policy - parse a new policy and replace @old with it.
+ * @root: Supplies a pointer to the securityfs inode saved the policy.
+ * @text: Supplies a pointer to the plain text policy.
+ * @textlen: Supplies the length of @text.
+ * @pkcs7: Supplies a pointer to a buffer containing a pkcs7 message.
+ * @pkcs7len: Supplies the length of @pkcs7len.
+ *
+ * @text/@textlen is mutually exclusive with @pkcs7/@pkcs7len - see
+ * ipe_new_policy.
+ *
+ * Return:
+ * * !IS_ERR	- The old policy
+ * * -ENOENT	- Policy doesn't exist
+ * * -EINVAL	- New policy is invalid
+ */
+struct ipe_policy *ipe_update_policy(struct inode *root,
+				     const char *text, size_t textlen,
+				     const char *pkcs7, size_t pkcs7len)
+{
+	int rc = 0;
+	struct ipe_policy *old, *ap, *new = NULL;
+
+	lockdep_assert_held(&ipe_policy_lock);
+
+	old = (struct ipe_policy *)root->i_private;
+	if (!old)
+		return ERR_PTR(-ENOENT);
+
+	new = ipe_new_policy(text, textlen, pkcs7, pkcs7len);
+	if (IS_ERR(new))
+		return new;
+
+	if (strcmp(new->parsed->name, old->parsed->name)) {
+		rc = -EINVAL;
+		goto err;
+	}
+
+	if (ver_to_u64(old) > ver_to_u64(new)) {
+		rc = -EINVAL;
+		goto err;
+	}
+
+	root->i_private = new;
+
+	ap = rcu_dereference_protected(ipe_active_policy,
+				       lockdep_is_held(&ipe_policy_lock));
+	if (old == ap)
+		rcu_assign_pointer(ipe_active_policy, new);
+
+	swap(new->policyfs, old->policyfs);
+
+out:
+	return (rc < 0) ? ERR_PTR(rc) : old;
+err:
+	ipe_free_policy(new);
+	goto out;
 }
 
 /**
@@ -94,4 +181,28 @@ struct ipe_policy *ipe_new_policy(const char *text, size_t textlen,
 err:
 	ipe_free_policy(new);
 	return ERR_PTR(rc);
+}
+
+/**
+ * ipe_set_active_pol - Make @p the active policy.
+ * @p: Supplies a pointer to the policy to make active.
+ *
+ * Return:
+ * * !IS_ERR	- Success
+ * * -EINVAL	- New active policy version is invalid
+ */
+int ipe_set_active_pol(const struct ipe_policy *p)
+{
+	struct ipe_policy *ap = NULL;
+
+	lockdep_assert_held(&ipe_policy_lock);
+
+	ap = rcu_dereference_protected(ipe_active_policy,
+				       lockdep_is_held(&ipe_policy_lock));
+	if (ap && ver_to_u64(ap) > ver_to_u64(p))
+		return -EINVAL;
+
+	rcu_assign_pointer(ipe_active_policy, p);
+
+	return 0;
 }

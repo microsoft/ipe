@@ -13,4 +13,6 @@
 
 #include <linux/lsm_hooks.h>
 
+extern bool ipe_enabled;
+
 #endif /* _IPE_H */
