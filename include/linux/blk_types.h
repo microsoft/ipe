@@ -69,6 +69,9 @@ struct block_device {
 #endif
 	bool			bd_ro_warned;
 	int			bd_writers;
+#ifdef CONFIG_SECURITY
+	void			*security;
+#endif
 	/*
 	 * keep this out-of-line as it's both big and not needed in the fast
 	 * path
