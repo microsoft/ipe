@@ -97,7 +97,8 @@ authenticating fs-verity file hashes include:
   authenticity of files on a per-file basis, leveraging fs-verity's
   robust protection capabilities in conjunction with IPE's policy-driven
   access control. For details on configuring IPE policies and
-  understanding its operational modes, see the IPE documentation.
+  understanding its operational modes, please refer to
+  Documentation/admin-guide/LSM/ipe.rst.
 
 - Trusted userspace code in combination with `Built-in signature
   verification`_.  This approach should be used only with great care.
@@ -512,6 +513,7 @@ be carefully considered before using them:
   files with an fs-verity builtin signature enabled to perform certain
   operations, such as execution. Note that IPE doesn't require
   fs.verity.require_signatures=1.
+  Please refer to Documentation/admin-guide/LSM/ipe.rst for more details.
 
 - A file's builtin signature can only be set at the same time that
   fs-verity is being enabled on the file.  Changing or deleting the
