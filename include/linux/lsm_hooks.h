@@ -1618,6 +1618,17 @@
  *	@what: kernel feature being accessed.
  *	Return 0 if permission is granted.
  *
+ * @bdev_alloc_security:
+ *	Initialize the security field inside a block_device structure.
+ *
+ * @bdev_free_security:
+ *	Cleanup the security information stored inside a block_device structure.
+ *
+ * @bdev_setsecurity:
+ *	Set a security property associated with @name for @bdev with
+ *	value @value. @size indicates the size of @value in bytes.
+ *	If a @name is not implemented, return -EOPNOTSUPP.
+ *
  * Security hooks for perf events
  *
  * @perf_event_open:
@@ -1687,6 +1698,7 @@ struct lsm_blob_sizes {
 	int	lbs_ipc;
 	int	lbs_msg_msg;
 	int	lbs_task;
+	int	lbs_bdev;
 };
 
 /*
