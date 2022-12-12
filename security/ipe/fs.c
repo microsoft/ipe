@@ -190,6 +190,7 @@ static const struct file_operations enforce_fops = {
 static int __init ipe_init_securityfs(void)
 {
 	int rc = 0;
+	struct ipe_policy *p = NULL;
 
 	if (!ipe_enabled)
 		return -EOPNOTSUPP;
@@ -224,6 +225,13 @@ static int __init ipe_init_securityfs(void)
 	if (IS_ERR(policy_root)) {
 		rc = PTR_ERR(policy_root);
 		goto err;
+	}
+
+	p = ipe_get_policy_rcu(ipe_active_policy);
+	if (p) {
+		rc = ipe_new_policyfs_node(p);
+		if (rc)
+			goto err;
 	}
 
 	return 0;
