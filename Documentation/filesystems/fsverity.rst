@@ -497,6 +497,7 @@ be carefully considered before using them:
   a kernel-enforced, system-wide authentication policy that allows only
   files with an fs-verity signature enabled to perform certain operations,
   such as execution. Note that IPE doesn't require fs.verity.require_signatures=1.
+  Please refer to Documentation/admin-guide/LSM/ipe.rst for more details.
 
 - A file's builtin signature can only be set at the same time that
   fs-verity is being enabled on the file.  Changing or deleting the
