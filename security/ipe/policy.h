@@ -70,11 +70,19 @@ struct ipe_policy {
 	size_t textlen;
 
 	struct ipe_parsed_policy *parsed;
+
+	struct dentry *policyfs;
 };
 
 struct ipe_policy *ipe_new_policy(const char *text, size_t textlen,
 				  const char *pkcs7, size_t pkcs7len);
 void ipe_free_policy(struct ipe_policy *pol);
 struct ipe_policy *ipe_get_policy_rcu(struct ipe_policy __rcu *p);
+struct ipe_policy *ipe_update_policy(struct ipe_policy __rcu **addr,
+				     const char *text,
+				     size_t textlen, const char *pkcs7,
+				     size_t pkcs7len);
+int ipe_set_active_pol(const struct ipe_policy *p);
+bool ipe_is_policy_active(const struct ipe_policy *p);
 
 #endif /* _IPE_POLICY_H */

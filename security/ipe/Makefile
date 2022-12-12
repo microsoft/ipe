@@ -7,7 +7,9 @@
 
 obj-$(CONFIG_SECURITY_IPE) += \
 	eval.o \
+	fs.o \
 	hooks.o \
 	ipe.o \
 	policy.o \
+	policy_fs.o \
 	policy_parser.o \
