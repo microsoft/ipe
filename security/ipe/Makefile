@@ -6,6 +6,7 @@
 #
 
 obj-$(CONFIG_SECURITY_IPE) += \
+	eval.o \
 	hooks.o \
 	ipe.o \
 	policy.o \

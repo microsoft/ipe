@@ -26,6 +26,8 @@ enum ipe_action_type {
 };
 
 enum ipe_prop_type {
+	__IPE_PROP_BOOT_VERIFIED_FALSE,
+	__IPE_PROP_BOOT_VERIFIED_TRUE,
 	__IPE_PROP_MAX
 };
 
@@ -73,5 +75,6 @@ struct ipe_policy {
 struct ipe_policy *ipe_new_policy(const char *text, size_t textlen,
 				  const char *pkcs7, size_t pkcs7len);
 void ipe_free_policy(struct ipe_policy *pol);
+struct ipe_policy *ipe_get_policy_rcu(struct ipe_policy __rcu *p);
 
 #endif /* _IPE_POLICY_H */

@@ -268,6 +268,8 @@ static enum ipe_action_type parse_action(char *t)
 }
 
 static const match_table_t property_tokens = {
+	{__IPE_PROP_BOOT_VERIFIED_FALSE,	"boot_verified=FALSE"},
+	{__IPE_PROP_BOOT_VERIFIED_TRUE,		"boot_verified=TRUE"},
 	{__IPE_PROP_MAX,			NULL}
 };
 
@@ -296,6 +298,10 @@ static int parse_property(char *t, struct ipe_rule *r)
 	token = match_token(t, property_tokens, args);
 
 	switch (token) {
+	case __IPE_PROP_BOOT_VERIFIED_FALSE:
+	case __IPE_PROP_BOOT_VERIFIED_TRUE:
+		p->type = token;
+		break;
 	case __IPE_PROP_MAX:
 	default:
 		rc = -EBADMSG;

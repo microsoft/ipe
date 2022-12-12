@@ -99,3 +99,23 @@ err:
 	ipe_free_policy(new);
 	return ERR_PTR(rc);
 }
+
+/**
+ * ipe_get_policy_rcu - Dereference a rcu-protected policy pointer.
+ *
+ * @p: rcu-protected pointer to a policy.
+ *
+ * Not safe to call on IS_ERR.
+ *
+ * Return: the value of @p
+ */
+struct ipe_policy *ipe_get_policy_rcu(struct ipe_policy __rcu *p)
+{
+	struct ipe_policy *rv = NULL;
+
+	rcu_read_lock();
+	rv = rcu_dereference(p);
+	rcu_read_unlock();
+
+	return rv;
+}
