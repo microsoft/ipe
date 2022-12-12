@@ -27,6 +27,9 @@
 				    "new_active_pol_version=%hu.%hu.%hu "\
 				    "new_policy_digest=" IPE_AUDIT_HASH_ALG ":"
 
+#define AUDIT_ENFORCE_CHANGE_FMT "enforcing=%d old_enforcing=%d auid=%u ses=%u "\
+				 "enabled=1 old-enabled=1 lsm=ipe res=1"
+
 static const char *const audit_op_names[__IPE_OP_MAX + 1] = {
 	"EXECUTE",
 	"FIRMWARE",
@@ -95,8 +98,8 @@ void ipe_audit_match(const struct ipe_eval_ctx *const ctx,
 	if (!ab)
 		return;
 
-	audit_log_format(ab, "ipe_op=%s ipe_hook=%s pid=%d comm=",
-			 op, audit_hook_names[ctx->hook],
+	audit_log_format(ab, "ipe_op=%s ipe_hook=%s enforcing=%d pid=%d comm=",
+			 op, audit_hook_names[ctx->hook], READ_ONCE(enforce),
 			 task_tgid_nr(current));
 	audit_log_untrustedstring(ab, get_task_comm(comm, current));
 
@@ -205,6 +208,26 @@ void ipe_audit_policy_load(const struct ipe_policy *const p)
 
 	audit_policy(ab, AUDIT_POLICY_LOAD_FMT, p);
 	audit_log_format(ab, " auid=%u ses=%u lsm=ipe res=1",
+			 from_kuid(&init_user_ns, audit_get_loginuid(current)),
+			 audit_get_sessionid(current));
+
+	audit_log_end(ab);
+}
+
+/**
+ * ipe_audit_enforce - Audit a change in IPE's enforcement state.
+ * @new_enforce: The new value enforce to be set.
+ * @old_enforce: The old value currently in enforce.
+ */
+void ipe_audit_enforce(bool new_enforce, bool old_enforce)
+{
+	struct audit_buffer *ab;
+
+	ab = audit_log_start(audit_context(), GFP_KERNEL, AUDIT_MAC_STATUS);
+	if (!ab)
+		return;
+
+	audit_log_format(ab, AUDIT_ENFORCE_CHANGE_FMT, new_enforce, old_enforce,
 			 from_kuid(&init_user_ns, audit_get_loginuid(current)),
 			 audit_get_sessionid(current));
 

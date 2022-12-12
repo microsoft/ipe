@@ -16,6 +16,7 @@
 
 extern struct ipe_policy __rcu *ipe_active_policy;
 extern bool success_audit;
+extern bool enforce;
 
 #ifdef CONFIG_BLK_DEV_INITRD
 struct ipe_sb {
