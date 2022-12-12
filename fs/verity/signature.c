@@ -41,7 +41,9 @@ static struct key *fsverity_keyring;
  * @sig_size: size of signature in bytes, or 0 if no signature
  *
  * If the file includes a signature of its fs-verity file digest, verify it
- * against the certificates in the fs-verity keyring.
+ * against the certificates in the fs-verity keyring. Note that verification
+ * happens as long as the file's signature exists regardless the state of
+ * fsverity_require_signatures.
  *
  * Return: 0 on success (signature valid or not required); -errno on failure
  */

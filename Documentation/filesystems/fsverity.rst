@@ -461,7 +461,9 @@ Enabling this option adds the following:
 
 3. A new sysctl "fs.verity.require_signatures" is made available.
    When set to 1, the kernel requires that all verity files have a
-   correctly signed digest as described in (2).
+   correctly signed digest as described in (2). Note that verification
+   happens as long as the file's signature exists regardless the state of
+   "fs.verity.require_signatures".
 
 The data that the signature as described in (2) must be a signature of
 is the fs-verity file digest in the following format::
