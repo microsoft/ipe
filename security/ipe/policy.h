@@ -33,6 +33,9 @@ enum ipe_action_type {
 enum ipe_prop_type {
 	__IPE_PROP_BOOT_VERIFIED_FALSE,
 	__IPE_PROP_BOOT_VERIFIED_TRUE,
+	__IPE_PROP_DMV_ROOTHASH,
+	__IPE_PROP_DMV_SIG_FALSE,
+	__IPE_PROP_DMV_SIG_TRUE,
 	__IPE_PROP_MAX
 };
 

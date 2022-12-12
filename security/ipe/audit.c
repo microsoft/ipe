@@ -13,6 +13,7 @@
 #include "hooks.h"
 #include "policy.h"
 #include "audit.h"
+#include "digest.h"
 
 #define ACTSTR(x) ((x) == __IPE_ACTION_ALLOW ? "ALLOW" : "DENY")
 
@@ -40,7 +41,28 @@ static const char *const audit_op_names[__IPE_OP_MAX] = {
 static const char *const audit_prop_names[__IPE_PROP_MAX] = {
 	"boot_verified=FALSE",
 	"boot_verified=TRUE",
+#ifdef CONFIG_IPE_PROP_DM_VERITY
+	"dmverity_roothash=",
+	"dmverity_signature=FALSE",
+	"dmverity_signature=TRUE",
+#endif /* CONFIG_IPE_PROP_DM_VERITY */
 };
+
+#ifdef CONFIG_IPE_PROP_DM_VERITY
+/**
+ * audit_dmv_roothash - audit a roothash of a dmverity volume.
+ * @ab: Supplies a pointer to the audit_buffer to append to.
+ * @r: Supplies a pointer to the digest structure.
+ */
+static void audit_dmv_roothash(struct audit_buffer *ab, const void *rh)
+{
+	ipe_digest_audit(ab, rh);
+}
+#else
+static void audit_dmv_roothash(struct audit_buffer *ab, const void *rh)
+{
+}
+#endif /* CONFIG_IPE_PROP_DM_VERITY */
 
 /**
  * audit_rule - audit an IPE policy rule approximation.
@@ -55,6 +77,9 @@ static void audit_rule(struct audit_buffer *ab, const struct ipe_rule *r)
 
 	list_for_each_entry(ptr, &r->props, next) {
 		audit_log_format(ab, "%s", audit_prop_names[ptr->type]);
+		if (ptr->type == __IPE_PROP_DMV_ROOTHASH)
+			audit_dmv_roothash(ab, ptr->value);
+
 		audit_log_format(ab, " ");
 	}
 
