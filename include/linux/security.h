@@ -86,6 +86,7 @@ enum lsm_event {
 enum lsm_integrity_type {
 	LSM_INT_DMVERITY_SIG,
 	LSM_INT_DMVERITY_ROOTHASH,
+	LSM_INT_FSVERITY_BUILTINSIG,
 };
 
 /*
