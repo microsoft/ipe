@@ -12,6 +12,7 @@
 #include "policy.h"
 #include "policy_parser.h"
 #include "digest.h"
+#include "audit.h"
 
 /* lock for synchronizing writers across ipe policy */
 DEFINE_SPINLOCK(ipe_policy_lock);
@@ -125,6 +126,9 @@ struct ipe_policy *ipe_update_policy(struct ipe_policy __rcu **addr,
 	swap(new->policyfs, old->policyfs);
 	ipe_free_policy(old);
 
+	if (!rc)
+		ipe_audit_policy_load(new);
+
 out:
 	return (rc < 0) ? ERR_PTR(rc) : new;
 err:
@@ -232,6 +236,7 @@ int ipe_set_active_pol(const struct ipe_policy *p)
 	spin_unlock(&ipe_policy_lock);
 	synchronize_rcu();
 
+	ipe_audit_policy_activation(ap, p);
 out:
 	return rc;
 }
