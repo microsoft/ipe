@@ -275,6 +275,11 @@ static const match_table_t property_tokens = {
 	{__IPE_PROP_DMV_SIG_FALSE,		"dmverity_signature=FALSE"},
 	{__IPE_PROP_DMV_SIG_TRUE,		"dmverity_signature=TRUE"},
 #endif /* CONFIG_IPE_PROP_DM_VERITY */
+#ifdef CONFIG_IPE_PROP_FS_VERITY
+	{__IPE_PROP_FSV_DIGEST,			"fsverity_digest=%s"},
+	{__IPE_PROP_FSV_SIG_FALSE,		"fsverity_signature=FALSE"},
+	{__IPE_PROP_FSV_SIG_TRUE,		"fsverity_signature=TRUE"},
+#endif /* CONFIG_IPE_PROP_FS_VERITY */
 	{__IPE_PROP_INVALID,			NULL}
 };
 
@@ -304,6 +309,7 @@ static int parse_property(char *t, struct ipe_rule *r)
 
 	switch (token) {
 	case __IPE_PROP_DMV_ROOTHASH:
+	case __IPE_PROP_FSV_DIGEST:
 		dup = match_strdup(&args[0]);
 		if (!dup) {
 			rc = -ENOMEM;
@@ -317,6 +323,8 @@ static int parse_property(char *t, struct ipe_rule *r)
 	case __IPE_PROP_BOOT_VERIFIED_TRUE:
 	case __IPE_PROP_DMV_SIG_FALSE:
 	case __IPE_PROP_DMV_SIG_TRUE:
+	case __IPE_PROP_FSV_SIG_FALSE:
+	case __IPE_PROP_FSV_SIG_TRUE:
 		p->type = token;
 		break;
 	case __IPE_PROP_INVALID:
