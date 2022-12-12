@@ -8,10 +8,14 @@
 #include <linux/types.h>
 #include <linux/binfmts.h>
 #include <linux/mman.h>
+#include <linux/blk_types.h>
+#include <linux/dm-verity.h>
+#include <crypto/hash_info.h>
 
 #include "ipe.h"
 #include "hooks.h"
 #include "eval.h"
+#include "digest.h"
 
 /**
  * ipe_bprm_check_security - ipe security hook function for bprm check.
@@ -187,3 +191,71 @@ void ipe_unpack_initramfs(void)
 {
 	ipe_sb(current->fs->root.mnt->mnt_sb)->initramfs = true;
 }
+
+#ifdef CONFIG_IPE_PROP_DM_VERITY
+/**
+ * ipe_bdev_free_security - free IPE's LSM blob of block_devices.
+ * @bdev: Supplies a pointer to a block_device that contains the structure
+ *	  to free.
+ */
+void ipe_bdev_free_security(struct block_device *bdev)
+{
+	struct ipe_bdev *blob = ipe_bdev(bdev);
+
+	ipe_digest_free(blob->root_hash);
+}
+
+/**
+ * ipe_bdev_setintegrity - save integrity data from a bdev to IPE's LSM blob.
+ * @bdev: Supplies a pointer to a block_device that contains the LSM blob.
+ * @type: Supplies the integrity type.
+ * @value: Supplies the value to store.
+ * @size: The size of @value.
+ */
+int ipe_bdev_setintegrity(struct block_device *bdev, enum lsm_integrity_type type,
+			  const void *value, size_t size)
+{
+	struct ipe_bdev *blob = ipe_bdev(bdev);
+
+	if (type == LSM_INT_DMVERITY_ROOTHASH) {
+		if (!value) {
+			ipe_digest_free(blob->root_hash);
+			blob->root_hash = NULL;
+
+			return 0;
+		}
+
+		const struct dm_verity_digest *digest = value;
+		struct digest_info *info = NULL;
+
+		info = kzalloc(sizeof(*info), GFP_KERNEL);
+		if (!info)
+			return -ENOMEM;
+
+		info->digest_len = digest->digest_len;
+
+		info->digest = kmemdup(digest->digest, info->digest_len,
+				       GFP_KERNEL);
+		if (!info->digest)
+			goto err;
+
+		info->alg = kstrdup(digest->alg, GFP_KERNEL);
+		if (!info->alg)
+			goto err;
+
+		blob->root_hash = info;
+
+		return 0;
+err:
+		ipe_digest_free(info);
+
+		return -ENOMEM;
+	} else if (type == LSM_INT_DMVERITY_SIG) {
+			blob->dm_verity_signed = size > 0 && value;
+
+		return 0;
+	}
+
+	return 0;
+}
+#endif /* CONFIG_IPE_PROP_DM_VERITY */
