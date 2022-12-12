@@ -319,4 +319,6 @@ static inline int fsverity_prepare_setattr(struct dentry *dentry,
 	return 0;
 }
 
+#define FS_VERITY_INODE_SEC_NAME "fsverity.builtin-sig"
+
 #endif	/* _LINUX_FSVERITY_H */
