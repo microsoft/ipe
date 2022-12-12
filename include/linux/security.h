@@ -84,7 +84,8 @@ enum lsm_event {
 };
 
 enum lsm_integrity_type {
-	__LSM_INT_MAX
+	LSM_INT_DMVERITY_SIG,
+	LSM_INT_DMVERITY_ROOTHASH,
 };
 
 /*
