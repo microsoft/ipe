@@ -461,7 +461,10 @@ Enabling this option adds the following:
 
 3. A new sysctl "fs.verity.require_signatures" is made available.
    When set to 1, the kernel requires that all verity files have a
-   correctly signed digest as described in (2).
+   correctly signed digest as described in (2). Note that verification
+   happens as long as the file's signature exists regardless of the state of
+   "fs.verity.require_signatures", and the IPE LSM relies on this behavior
+   to save verified signature into LSM blobs.
 
 The data that the signature as described in (2) must be a signature of
 is the fs-verity file digest in the following format::
@@ -481,7 +484,7 @@ be carefully considered before using them:
 
 - Builtin signature verification does *not* make the kernel enforce
   that any files actually have fs-verity enabled.  Thus, it is not a
-  complete authentication policy.  Currently, if it is used, the only
+  complete authentication policy.  Currently, if it is used, one
   way to complete the authentication policy is for trusted userspace
   code to explicitly check whether files have fs-verity enabled with a
   signature before they are accessed.  (With
@@ -489,6 +492,11 @@ be carefully considered before using them:
   enabled suffices.)  But, in this case the trusted userspace code
   could just store the signature alongside the file and verify it
   itself using a cryptographic library, instead of using this feature.
+  Another approach is to utilize built-in signature verification in
+  conjunction with the IPE LSM, which supports defining
+  a kernel-enforced, system-wide authentication policy that allows only
+  files with an fs-verity signature enabled to perform certain operations,
+  such as execution. Note that IPE doesn't require fs.verity.require_signatures=1.
 
 - A file's builtin signature can only be set at the same time that
   fs-verity is being enabled on the file.  Changing or deleting the

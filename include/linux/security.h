@@ -86,6 +86,7 @@ enum lsm_event {
 enum lsm_intgr_type {
 	LSM_INTGR_DMV_SIG,
 	LSM_INTGR_DMV_ROOTHASH,
+	LSM_INTGR_FSV_SIG,
 	__LSM_INTGR_MAX
 };
 
