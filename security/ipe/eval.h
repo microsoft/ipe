@@ -14,6 +14,7 @@
 
 extern struct ipe_policy __rcu *ipe_active_policy;
 extern bool success_audit;
+extern bool enforce;
 
 struct ipe_eval_ctx {
 	enum ipe_op_type op;
