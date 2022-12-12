@@ -218,6 +218,7 @@ static void free_rule(struct ipe_rule *r)
 
 	list_for_each_entry_safe(p, t, &r->props, next) {
 		list_del(&p->next);
+		ipe_digest_free(&p->value);
 		kfree(p);
 	}
 
@@ -270,6 +271,11 @@ static enum ipe_action_type parse_action(char *t)
 static const match_table_t property_tokens = {
 	{__IPE_PROP_BOOT_VERIFIED_FALSE,	"boot_verified=FALSE"},
 	{__IPE_PROP_BOOT_VERIFIED_TRUE,		"boot_verified=TRUE"},
+#ifdef CONFIG_IPE_PROP_DM_VERITY
+	{__IPE_PROP_DMV_ROOTHASH,		"dmverity_roothash=%s"},
+	{__IPE_PROP_DMV_SIG_FALSE,		"dmverity_signature=FALSE"},
+	{__IPE_PROP_DMV_SIG_TRUE,		"dmverity_signature=TRUE"},
+#endif /* CONFIG_IPE_PROP_DM_VERITY */
 	{__IPE_PROP_MAX,			NULL}
 };
 
@@ -298,8 +304,18 @@ static int parse_property(char *t, struct ipe_rule *r)
 	token = match_token(t, property_tokens, args);
 
 	switch (token) {
+	case __IPE_PROP_DMV_ROOTHASH:
+		dup = match_strdup(&args[0]);
+		if (!dup) {
+			rc = -ENOMEM;
+			goto err;
+		}
+		rc = ipe_digest_parse(dup, &p->value);
+		fallthrough;
 	case __IPE_PROP_BOOT_VERIFIED_FALSE:
 	case __IPE_PROP_BOOT_VERIFIED_TRUE:
+	case __IPE_PROP_DMV_SIG_FALSE:
+	case __IPE_PROP_DMV_SIG_TRUE:
 		p->type = token;
 		break;
 	case __IPE_PROP_MAX:
