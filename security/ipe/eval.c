@@ -9,6 +9,7 @@
 #include <linux/file.h>
 #include <linux/sched.h>
 #include <linux/rcupdate.h>
+#include <linux/spinlock.h>
 
 #include "ipe.h"
 #include "eval.h"
@@ -16,6 +17,44 @@
 #include "policy.h"
 
 struct ipe_policy __rcu *ipe_active_policy;
+
+static const struct super_block *pinned_sb;
+static DEFINE_SPINLOCK(pin_lock);
+#define FILE_SUPERBLOCK(f) ((f)->f_path.mnt->mnt_sb)
+
+/**
+ * pin_sb - Pin the underlying superblock of @f, marking it as trusted.
+ * @sb: Supplies a super_block structure to be pinned.
+ */
+static void pin_sb(const struct super_block *sb)
+{
+	if (!sb)
+		return;
+	spin_lock(&pin_lock);
+	if (!pinned_sb)
+		pinned_sb = sb;
+	spin_unlock(&pin_lock);
+}
+
+/**
+ * from_pinned - Determine whether @sb is the pinned super_block.
+ * @sb: Supplies a super_block to check against the pinned super_block.
+ *
+ * Return:
+ * * true	- @sb is the pinned super_block
+ * * false	- @sb is not the pinned super_block
+ */
+static bool from_pinned(const struct super_block *sb)
+{
+	bool rv;
+
+	if (!sb)
+		return false;
+	spin_lock(&pin_lock);
+	rv = !IS_ERR_OR_NULL(pinned_sb) && pinned_sb == sb;
+	spin_unlock(&pin_lock);
+	return rv;
+}
 
 /**
  * build_eval_ctx - Build an evaluation context.
@@ -27,8 +66,14 @@ void build_eval_ctx(struct ipe_eval_ctx *ctx,
 		    const struct file *file,
 		    enum ipe_op_type op)
 {
+	if (op == __IPE_OP_EXEC && file)
+		pin_sb(FILE_SUPERBLOCK(file));
+
 	ctx->file = file;
 	ctx->op = op;
+
+	if (file)
+		ctx->from_init_sb = from_pinned(FILE_SUPERBLOCK(file));
 }
 
 /**
@@ -43,7 +88,14 @@ void build_eval_ctx(struct ipe_eval_ctx *ctx,
 static bool evaluate_property(const struct ipe_eval_ctx *const ctx,
 			      struct ipe_prop *p)
 {
-	return false;
+	switch (p->type) {
+	case __IPE_PROP_BOOT_VERIFIED_FALSE:
+		return !ctx->from_init_sb;
+	case __IPE_PROP_BOOT_VERIFIED_TRUE:
+		return ctx->from_init_sb;
+	default:
+		return false;
+	}
 }
 
 /**
@@ -105,4 +157,22 @@ eval:
 		rc = -EACCES;
 
 	return rc;
+}
+
+/**
+ * ipe_invalidate_pinned_sb - invalidate the ipe pinned super_block.
+ * @mnt_sb: super_block to check against the pinned super_block.
+ *
+ * This function is called a super_block like the initramfs's is freed,
+ * if the super_block is currently pinned by ipe it will be invalided,
+ * so ipe won't consider the block device is boot verified afterward.
+ */
+void ipe_invalidate_pinned_sb(const struct super_block *mnt_sb)
+{
+	spin_lock(&pin_lock);
+
+	if (mnt_sb == pinned_sb)
+		pinned_sb = ERR_PTR(-EIO);
+
+	spin_unlock(&pin_lock);
 }

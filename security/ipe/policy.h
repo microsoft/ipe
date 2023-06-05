@@ -30,6 +30,8 @@ enum ipe_action_type {
 #define __IPE_ACTION_INVALID __IPE_ACTION_MAX
 
 enum ipe_prop_type {
+	__IPE_PROP_BOOT_VERIFIED_FALSE,
+	__IPE_PROP_BOOT_VERIFIED_TRUE,
 	__IPE_PROP_MAX
 };
 

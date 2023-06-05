@@ -265,6 +265,12 @@ static enum ipe_action_type parse_action(char *t)
 	return match_token(t, action_tokens, args);
 }
 
+static const match_table_t property_tokens = {
+	{__IPE_PROP_BOOT_VERIFIED_FALSE,	"boot_verified=FALSE"},
+	{__IPE_PROP_BOOT_VERIFIED_TRUE,		"boot_verified=TRUE"},
+	{__IPE_PROP_INVALID,			NULL}
+};
+
 /**
  * parse_property - Parse the property type given a token string.
  * @t: Supplies the token string to be parsed.
@@ -277,7 +283,36 @@ static enum ipe_action_type parse_action(char *t)
  */
 static int parse_property(char *t, struct ipe_rule *r)
 {
-	return -EBADMSG;
+	substring_t args[MAX_OPT_ARGS];
+	struct ipe_prop *p = NULL;
+	int rc = 0;
+	int token;
+
+	p = kzalloc(sizeof(*p), GFP_KERNEL);
+	if (!p)
+		return -ENOMEM;
+
+	token = match_token(t, property_tokens, args);
+
+	switch (token) {
+	case __IPE_PROP_BOOT_VERIFIED_FALSE:
+	case __IPE_PROP_BOOT_VERIFIED_TRUE:
+		p->type = token;
+		break;
+	case __IPE_PROP_INVALID:
+	default:
+		rc = -EBADMSG;
+		break;
+	}
+	if (rc)
+		goto err;
+	list_add_tail(&p->next, &r->props);
+
+out:
+	return rc;
+err:
+	kfree(p);
+	goto out;
 }
 
 /**
