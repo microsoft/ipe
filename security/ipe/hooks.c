@@ -28,7 +28,7 @@ int ipe_bprm_check_security(struct linux_binprm *bprm)
 {
 	struct ipe_eval_ctx ctx = IPE_EVAL_CTX_INIT;
 
-	build_eval_ctx(&ctx, bprm->file, IPE_OP_EXEC);
+	build_eval_ctx(&ctx, bprm->file, IPE_OP_EXEC, IPE_HOOK_BPRM_CHECK);
 	return ipe_evaluate_event(&ctx);
 }
 
@@ -53,7 +53,7 @@ int ipe_mmap_file(struct file *f, unsigned long reqprot __always_unused,
 	struct ipe_eval_ctx ctx = IPE_EVAL_CTX_INIT;
 
 	if (prot & PROT_EXEC) {
-		build_eval_ctx(&ctx, f, IPE_OP_EXEC);
+		build_eval_ctx(&ctx, f, IPE_OP_EXEC, IPE_HOOK_MMAP);
 		return ipe_evaluate_event(&ctx);
 	}
 
@@ -85,7 +85,7 @@ int ipe_file_mprotect(struct vm_area_struct *vma,
 		return 0;
 
 	if (prot & PROT_EXEC) {
-		build_eval_ctx(&ctx, vma->vm_file, IPE_OP_EXEC);
+		build_eval_ctx(&ctx, vma->vm_file, IPE_OP_EXEC, IPE_HOOK_MPROTECT);
 		return ipe_evaluate_event(&ctx);
 	}
 
@@ -135,7 +135,7 @@ int ipe_kernel_read_file(struct file *file, enum kernel_read_file_id id,
 		WARN(1, "no rule setup for kernel_read_file enum %d", id);
 	}
 
-	build_eval_ctx(&ctx, file, op);
+	build_eval_ctx(&ctx, file, op, IPE_HOOK_KERNEL_READ);
 	return ipe_evaluate_event(&ctx);
 }
 
@@ -179,7 +179,7 @@ int ipe_kernel_load_data(enum kernel_load_data_id id, bool contents)
 		WARN(1, "no rule setup for kernel_load_data enum %d", id);
 	}
 
-	build_eval_ctx(&ctx, NULL, op);
+	build_eval_ctx(&ctx, NULL, op, IPE_HOOK_KERNEL_LOAD);
 	return ipe_evaluate_event(&ctx);
 }
 
