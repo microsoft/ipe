@@ -14,6 +14,7 @@
 #define IPE_EVAL_CTX_INIT ((struct ipe_eval_ctx){ 0 })
 
 extern struct ipe_policy __rcu *ipe_active_policy;
+extern bool success_audit;
 
 #ifdef CONFIG_BLK_DEV_INITRD
 struct ipe_sb {
@@ -28,6 +29,13 @@ struct ipe_eval_ctx {
 #ifdef CONFIG_BLK_DEV_INITRD
 	bool from_initramfs;
 #endif /* CONFIG_BLK_DEV_INITRD */
+};
+
+enum ipe_match {
+	IPE_MATCH_RULE = 0,
+	IPE_MATCH_TABLE,
+	IPE_MATCH_GLOBAL,
+	__IPE_MATCH_MAX
 };
 
 void build_eval_ctx(struct ipe_eval_ctx *ctx, const struct file *file, enum ipe_op_type op);

@@ -9,12 +9,15 @@
 #include <linux/file.h>
 #include <linux/sched.h>
 #include <linux/rcupdate.h>
+#include <linux/moduleparam.h>
 
 #include "ipe.h"
 #include "eval.h"
 #include "policy.h"
+#include "audit.h"
 
 struct ipe_policy __rcu *ipe_active_policy;
+bool success_audit;
 
 #define FILE_SUPERBLOCK(f) ((f)->f_path.mnt->mnt_sb)
 
@@ -125,6 +128,7 @@ int ipe_evaluate_event(const struct ipe_eval_ctx *const ctx)
 {
 	bool match = false;
 	enum ipe_action_type action;
+	enum ipe_match match_type;
 	struct ipe_policy *pol = NULL;
 	const struct ipe_rule *rule = NULL;
 	const struct ipe_op_table *rules = NULL;
@@ -139,15 +143,15 @@ int ipe_evaluate_event(const struct ipe_eval_ctx *const ctx)
 	}
 
 	if (ctx->op == IPE_OP_INVALID) {
-		if (pol->parsed->global_default_action == IPE_ACTION_DENY) {
-			rcu_read_unlock();
-			return -EACCES;
-		}
-		if (pol->parsed->global_default_action == IPE_ACTION_INVALID)
-			WARN(1, "the IPE global default action is not set"
-				"and the opeartion is unkown, ALLOW it");
+		if (pol->parsed->global_default_action == IPE_ACTION_INVALID) {
+			WARN(1, "the IPE global default action is not set, "
+				"and the event opeartion is unkown, ALLOW it");
+			action = IPE_ACTION_ALLOW;
+		} else
+			action = pol->parsed->global_default_action;
 		rcu_read_unlock();
-		return 0;
+		match_type = IPE_MATCH_GLOBAL;
+		goto eval;
 	}
 
 	rules = &pol->parsed->rules[ctx->op];
@@ -165,16 +169,32 @@ int ipe_evaluate_event(const struct ipe_eval_ctx *const ctx)
 			break;
 	}
 
-	if (match)
+	if (match) {
 		action = rule->action;
-	else if (rules->default_action != IPE_ACTION_INVALID)
+		match_type = IPE_MATCH_RULE;
+	} else if (rules->default_action != IPE_ACTION_INVALID) {
 		action = rules->default_action;
-	else
+		match_type = IPE_MATCH_TABLE;
+	} else {
 		action = pol->parsed->global_default_action;
+		match_type = IPE_MATCH_GLOBAL;
+	}
 
 	rcu_read_unlock();
+eval:
+	ipe_audit_match(ctx, match_type, action, rule);
+
 	if (action == IPE_ACTION_DENY)
 		return -EACCES;
 
 	return 0;
 }
+
+/* Set the right module name */
+#ifdef KBUILD_MODNAME
+#undef KBUILD_MODNAME
+#define KBUILD_MODNAME "ipe"
+#endif
+
+module_param(success_audit, bool, 0400);
+MODULE_PARM_DESC(success_audit, "Start IPE with success auditing enabled");
