@@ -10,13 +10,16 @@
 #include <linux/sched.h>
 #include <linux/rcupdate.h>
 #include <linux/spinlock.h>
+#include <linux/moduleparam.h>
 
 #include "ipe.h"
 #include "eval.h"
 #include "hooks.h"
 #include "policy.h"
+#include "audit.h"
 
 struct ipe_policy __rcu *ipe_active_policy;
+bool success_audit;
 
 static const struct super_block *pinned_sb;
 static DEFINE_SPINLOCK(pin_lock);
@@ -114,6 +117,7 @@ int ipe_evaluate_event(const struct ipe_eval_ctx *const ctx)
 	int rc = 0;
 	bool match = false;
 	enum ipe_action_type action;
+	enum ipe_match match_type;
 	struct ipe_policy *pol = NULL;
 	const struct ipe_rule *rule = NULL;
 	const struct ipe_op_table *rules = NULL;
@@ -129,6 +133,7 @@ int ipe_evaluate_event(const struct ipe_eval_ctx *const ctx)
 
 	if (ctx->op == __IPE_OP_INVALID) {
 		action = pol->parsed->global_default_action;
+		match_type = __IPE_MATCH_GLOBAL;
 		goto eval;
 	}
 
@@ -144,15 +149,21 @@ int ipe_evaluate_event(const struct ipe_eval_ctx *const ctx)
 			break;
 	}
 
-	if (match)
+	if (match) {
 		action = rule->action;
-	else if (rules->default_action != __IPE_ACTION_INVALID)
+		match_type = __IPE_MATCH_RULE;
+	} else if (rules->default_action != __IPE_ACTION_INVALID) {
 		action = rules->default_action;
-	else
+		match_type = __IPE_MATCH_TABLE;
+	} else {
 		action = pol->parsed->global_default_action;
+		match_type = __IPE_MATCH_GLOBAL;
+	}
 
 	rcu_read_unlock();
 eval:
+	ipe_audit_match(ctx, match_type, action, rule);
+
 	if (action == __IPE_ACTION_DENY)
 		rc = -EACCES;
 
@@ -176,3 +187,12 @@ void ipe_invalidate_pinned_sb(const struct super_block *mnt_sb)
 
 	spin_unlock(&pin_lock);
 }
+
+/* Set the right module name */
+#ifdef KBUILD_MODNAME
+#undef KBUILD_MODNAME
+#define KBUILD_MODNAME "ipe"
+#endif
+
+module_param(success_audit, bool, 0400);
+MODULE_PARM_DESC(success_audit, "Start IPE with success auditing enabled");

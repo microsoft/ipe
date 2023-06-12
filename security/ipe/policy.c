@@ -11,6 +11,7 @@
 #include "fs.h"
 #include "policy.h"
 #include "policy_parser.h"
+#include "audit.h"
 
 /* lock for synchronizing writers across ipe policy */
 DEFINE_MUTEX(ipe_policy_lock);
@@ -119,6 +120,8 @@ struct ipe_policy *ipe_update_policy(struct inode *root,
 
 	swap(new->policyfs, old->policyfs);
 
+	ipe_audit_policy_load(new);
+
 out:
 	return (rc < 0) ? ERR_PTR(rc) : old;
 err:
@@ -203,6 +206,8 @@ int ipe_set_active_pol(const struct ipe_policy *p)
 		return -EINVAL;
 
 	rcu_assign_pointer(ipe_active_policy, p);
+
+	ipe_audit_policy_activation(ap, p);
 
 	return 0;
 }
