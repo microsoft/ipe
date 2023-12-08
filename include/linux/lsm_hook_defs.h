@@ -419,3 +419,7 @@ LSM_HOOK(int, 0, uring_override_creds, const struct cred *new)
 LSM_HOOK(int, 0, uring_sqpoll, void)
 LSM_HOOK(int, 0, uring_cmd, struct io_uring_cmd *ioucmd)
 #endif /* CONFIG_IO_URING */
+
+#ifdef CONFIG_BLK_DEV_INITRD
+LSM_HOOK(void, LSM_RET_VOID, unpack_initramfs_security, void)
+#endif

@@ -5337,3 +5337,10 @@ int security_uring_cmd(struct io_uring_cmd *ioucmd)
 	return call_int_hook(uring_cmd, 0, ioucmd);
 }
 #endif /* CONFIG_IO_URING */
+
+#ifdef CONFIG_BLK_DEV_INITRD
+void security_unpack_initramfs(void)
+{
+	call_void_hook(unpack_initramfs_security);
+}
+#endif /* CONFIG_BLK_DEV_INITRD */
