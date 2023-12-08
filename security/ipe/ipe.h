@@ -12,5 +12,8 @@
 #define pr_fmt(fmt) "IPE: " fmt
 
 #include <linux/lsm_hooks.h>
+#ifdef CONFIG_BLK_DEV_INITRD
+struct ipe_sb *ipe_sb(const struct super_block *sb);
+#endif /* CONFIG_BLK_DEV_INITRD */
 
 #endif /* _IPE_H */

@@ -16,6 +16,24 @@
 
 struct ipe_policy __rcu *ipe_active_policy;
 
+#define FILE_SUPERBLOCK(f) ((f)->f_path.mnt->mnt_sb)
+
+#ifdef CONFIG_BLK_DEV_INITRD
+/**
+ * build_ipe_sb_ctx - Build from_initramfs field of an evaluation context.
+ * @ctx: Supplies a pointer to the context to be populdated.
+ * @file: Supplies the file struct of the file triggered IPE event.
+ */
+static void build_ipe_sb_ctx(struct ipe_eval_ctx *ctx, const struct file *const file)
+{
+	ctx->from_initramfs = ipe_sb(FILE_SUPERBLOCK(file))->is_initramfs;
+}
+#else
+static void build_ipe_sb_ctx(struct ipe_eval_ctx *ctx, const struct file *const file)
+{
+}
+#endif /* CONFIG_BLK_DEV_INITRD */
+
 /**
  * build_eval_ctx - Build an evaluation context.
  * @ctx: Supplies a pointer to the context to be populdated.
@@ -28,7 +46,48 @@ void build_eval_ctx(struct ipe_eval_ctx *ctx,
 {
 	ctx->file = file;
 	ctx->op = op;
+
+	if (file)
+		build_ipe_sb_ctx(ctx, file);
 }
+
+#ifdef CONFIG_BLK_DEV_INITRD
+/**
+ * evaluate_boot_verified_true - Evaluate @ctx for the boot verified property.
+ * @ctx: Supplies a pointer to the context being evaluated.
+ *
+ * Return:
+ * * true	- The current @ctx match the @p
+ * * false	- The current @ctx doesn't match the @p
+ */
+static bool evaluate_boot_verified_true(const struct ipe_eval_ctx *const ctx)
+{
+	return ctx->from_initramfs;
+}
+
+/**
+ * evaluate_boot_verified_false - Evaluate @ctx for the boot verified property.
+ * @ctx: Supplies a pointer to the context being evaluated.
+ *
+ * Return:
+ * * true	- The current @ctx match the @p
+ * * false	- The current @ctx doesn't match the @p
+ */
+static bool evaluate_boot_verified_false(const struct ipe_eval_ctx *const ctx)
+{
+	return !evaluate_boot_verified_true(ctx);
+}
+#else
+static bool evaluate_boot_verified_true(const struct ipe_eval_ctx *const ctx)
+{
+	return false;
+}
+
+static bool evaluate_boot_verified_false(const struct ipe_eval_ctx *const ctx)
+{
+	return false;
+}
+#endif /* CONFIG_BLK_DEV_INITRD */
 
 /**
  * evaluate_property - Analyze @ctx against a property.
@@ -42,7 +101,14 @@ void build_eval_ctx(struct ipe_eval_ctx *ctx,
 static bool evaluate_property(const struct ipe_eval_ctx *const ctx,
 			      struct ipe_prop *p)
 {
-	return false;
+	switch (p->type) {
+	case IPE_PROP_BOOT_VERIFIED_FALSE:
+		return evaluate_boot_verified_false(ctx);
+	case IPE_PROP_BOOT_VERIFIED_TRUE:
+		return evaluate_boot_verified_true(ctx);
+	default:
+		return false;
+	}
 }
 
 /**

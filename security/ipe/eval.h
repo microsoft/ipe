@@ -15,10 +15,19 @@
 
 extern struct ipe_policy __rcu *ipe_active_policy;
 
+#ifdef CONFIG_BLK_DEV_INITRD
+struct ipe_sb {
+	bool is_initramfs;
+};
+#endif /* CONFIG_BLK_DEV_INITRD */
+
 struct ipe_eval_ctx {
 	enum ipe_op_type op;
 
 	const struct file *file;
+#ifdef CONFIG_BLK_DEV_INITRD
+	bool from_initramfs;
+#endif /* CONFIG_BLK_DEV_INITRD */
 };
 
 void build_eval_ctx(struct ipe_eval_ctx *ctx, const struct file *file, enum ipe_op_type op);
