@@ -4,6 +4,7 @@
  */
 
 #include <linux/fs.h>
+#include <linux/fs_struct.h>
 #include <linux/types.h>
 #include <linux/binfmts.h>
 #include <linux/mman.h>
@@ -180,4 +181,9 @@ int ipe_kernel_load_data(enum kernel_load_data_id id, bool contents)
 
 	build_eval_ctx(&ctx, NULL, op);
 	return ipe_evaluate_event(&ctx);
+}
+
+void ipe_unpack_initramfs(void)
+{
+	ipe_sb(current->fs->root.mnt->mnt_sb)->initramfs = true;
 }
