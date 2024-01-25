@@ -1,0 +1,4 @@
+policy_name=Test_Policy policy_version=0.0.0 unknown_header=fail
+DEFAULT action=DENY
+
+op=EXECUTE boot_verified=TRUE action=ALLOW

@@ -1,0 +1,6 @@
+policy_name=Test_Policy policy_version=0.0.0
+DEFAULT action=DENY
+
+op=EXECUTE dmverity_roothash=sha256:401fcec5944823ae12f62726e8184407a5fa9599783f030dec146938 action=DENY
+op=EXECUTE boot_verified=TRUE action=ALLOW
+op=EXECUTE dmverity_signature=TRUE action=ALLOW

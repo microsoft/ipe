@@ -1,0 +1,6 @@
+policy_name=Test_Policy policy_version=0.0.1
+
+# The Global Default
+DEFAULT action=ALLOW
+# The operation specific default
+DEFAULT op=EXECUTE action=DENY

@@ -1,0 +1,4 @@
+policy_name=Test_Policy
+DEFAULT action=DENY
+
+op=EXECUTE boot_verified=TRUE action=ALLOW

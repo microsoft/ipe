@@ -1,0 +1,2 @@
+policy_version=0.0.0 policy_name=Test_Policy
+DEFAULT action=ALLOW

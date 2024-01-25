@@ -1,0 +1,2 @@
+policy_name=Test_Policy policy_version=0.0.0 #This is comment
+DEFAULT action=ALLOW

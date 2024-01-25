@@ -1,0 +1,5 @@
+policy_name=dmverity_roothash policy_version=0.0.0
+DEFAULT action=DENY
+
+#Please update the roothash before running the tests
+op=EXECUTE dmverity_roothash=sha256:ROOTHASH action=ALLOW

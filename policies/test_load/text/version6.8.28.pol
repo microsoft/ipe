@@ -1,0 +1,33 @@
+policy_name=Test_Policy policy_version=6.8.28
+# This is a comment
+# Execution is denied, except for if it's boot verified or dmverity_verified
+DEFAULT op=EXECUTE action=DENY
+op=EXECUTE boot_verified=TRUE action=ALLOW
+op=EXECUTE dmverity_signature=TRUE action=ALLOW
+    
+# Kernel Reads (KEXEC_IMAGE, KEXEC_INITRAMFS, FIRMWARE, FIRMWARE_BUFFER, X509_CERTIFIACTE,
+# POLICY, and MODULE) are denied by default
+DEFAULT op=FIRMWARE action=DENY
+DEFAULT op=KMODULE action=DENY
+DEFAULT op=KEXEC_IMAGE action=DENY
+DEFAULT op=KEXEC_INITRAMFS action=DENY
+DEFAULT op=POLICY action=DENY
+DEFAULT op=X509_CERT action=DENY
+    
+# Allow KEXEC IMAGE/INITRAMFS without any integrity requirements
+op=KEXEC_IMAGE action=ALLOW
+op=KEXEC_INITRAMFS action=ALLOW
+    
+# Everything else must be verified in some way
+op=FIRMWARE dmverity_signature=TRUE action=ALLOW
+op=KMODULE dmverity_signature=TRUE action=ALLOW
+op=KEXEC_IMAGE dmverity_signature=TRUE action=ALLOW
+op=KEXEC_INITRAMFS dmverity_signature=TRUE action=ALLOW
+op=POLICY dmverity_signature=TRUE action=ALLOW
+op=X509_CERT dmverity_signature=TRUE action=ALLOW
+op=FIRMWARE boot_verified=TRUE action=ALLOW
+op=KMODULE boot_verified=TRUE action=ALLOW
+op=KEXEC_IMAGE boot_verified=TRUE action=ALLOW
+op=KEXEC_INITRAMFS boot_verified=TRUE action=ALLOW
+op=POLICY boot_verified=TRUE action=ALLOW
+op=X509_CERT boot_verified=TRUE action=ALLOW
