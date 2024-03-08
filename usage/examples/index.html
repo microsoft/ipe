@@ -12,12 +12,9 @@
         <link href="../../css/bootstrap.min.css" rel="stylesheet">
         <link href="../../css/font-awesome.min.css" rel="stylesheet">
         <link href="../../css/base.css" rel="stylesheet">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
-
-        <script src="../../js/jquery-1.10.2.min.js" defer></script>
-        <script src="../../js/bootstrap.min.js" defer></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
-        <script>hljs.initHighlightingOnLoad();</script> 
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script>hljs.highlightAll();</script> 
     </head>
 
     <body>
@@ -168,14 +165,12 @@
 <pre><code>policy_name=&quot;Allow All&quot; policy_version=0.0.0
 DEFAULT action=ALLOW
 </code></pre>
-
 <h2 id="allow-only-initial-superblock">Allow only initial superblock</h2>
 <pre><code>policy_name=&quot;Allow All Initial SB&quot; policy_version=0.0.0
 DEFAULT action=DENY
 
 op=EXECUTE boot_verified=TRUE action=ALLOW
 </code></pre>
-
 <h2 id="allow-any-signed-dm-verity-volume-and-the-initial-superblock">Allow any signed dm-verity volume and the initial superblock</h2>
 <pre><code>policy_name=&quot;AllowSignedAndInitial&quot; policy_version=0.0.0
 DEFAULT action=DENY
@@ -183,7 +178,6 @@ DEFAULT action=DENY
 op=EXECUTE boot_verified=TRUE action=ALLOW
 op=EXECUTE dmverity_signature=TRUE action=ALLOW
 </code></pre>
-
 <h2 id="prohibit-execution-from-a-specific-dm-verity-volume">Prohibit execution from a specific dm-verity volume</h2>
 <pre><code>policy_name=&quot;AllowSignedAndInitial&quot; policy_version=0.0.0
 DEFAULT action=DENY
@@ -192,7 +186,6 @@ op=EXECUTE dmverity_roothash=401fcec5944823ae12f62726e8184407a5fa9599783f030dec1
 op=EXECUTE boot_verified=TRUE action=ALLOW
 op=EXECUTE dmverity_signature=TRUE action=ALLOW
 </code></pre>
-
 <h2 id="allow-only-a-specific-dm-verity-volume">Allow only a specific dm-verity volume</h2>
 <pre><code>policy_name=&quot;AllowSignedAndInitial&quot; policy_version=0.0.0
 DEFAULT action=DENY
@@ -207,12 +200,14 @@ op=EXECUTE dmverity_roothash=401fcec5944823ae12f62726e8184407a5fa9599783f030dec1
                 <p>Copyright (c) Microsoft. All rights reserved.</p>
             <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
         </footer>
+        <script src="../../js/jquery-3.6.0.min.js"></script>
+        <script src="../../js/bootstrap.min.js"></script>
         <script>
             var base_url = "../..",
                 shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
         </script>
-        <script src="../../js/base.js" defer></script>
-        <script src="../../search/main.js" defer></script>
+        <script src="../../js/base.js"></script>
+        <script src="../../search/main.js"></script>
 
         <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
@@ -222,16 +217,13 @@ op=EXECUTE dmverity_roothash=401fcec5944823ae12f62726e8184407a5fa9599783f030dec1
                 <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
             </div>
             <div class="modal-body">
-                <p>
-                    From here you can search these documents. Enter
-                    your search terms below.
-                </p>
+                <p>From here you can search these documents. Enter your search terms below.</p>
                 <form>
                     <div class="form-group">
                         <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
                     </div>
                 </form>
-                <div id="mkdocs-search-results"></div>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
             </div>
             <div class="modal-footer">
             </div>

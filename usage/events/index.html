@@ -12,12 +12,9 @@
         <link href="../../css/bootstrap.min.css" rel="stylesheet">
         <link href="../../css/font-awesome.min.css" rel="stylesheet">
         <link href="../../css/base.css" rel="stylesheet">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
-
-        <script src="../../js/jquery-1.10.2.min.js" defer></script>
-        <script src="../../js/bootstrap.min.js" defer></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
-        <script>hljs.initHighlightingOnLoad();</script> 
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script>hljs.highlightAll();</script> 
     </head>
 
     <body>
@@ -164,9 +161,8 @@
 provides various information about these events and the descriptions of the
 fields that are emitted by these events to help with analysis of audit logs.</p>
 <h2 id="policy-load-staging">Policy Load / Staging</h2>
-<pre><code class="auditd">AUDIT1808 IPE policy_name=&quot;AllowAll&quot; policy_version=0.0.0 sha1=776FA5945C012EDDFC0866D7E3DE883CC0B67930
+<pre><code class="language-auditd">AUDIT1808 IPE policy_name=&quot;AllowAll&quot; policy_version=0.0.0 sha1=776FA5945C012EDDFC0866D7E3DE883CC0B67930
 </code></pre>
-
 <p>This event is emitted when a policy is loaded via <code>$SECURITYFS/ipe/new_policy</code>
 or <code>$SECURITYFS/ipe/policies/&lt;policy_name&gt;/raw</code>. It is emitted to the audit
 channel, and can be used to provide a record of what policies were loaded
@@ -174,29 +170,28 @@ on the system.</p>
 <table>
 <thead>
 <tr>
-<th align="center">Field</th>
-<th align="left">Description</th>
+<th style="text-align: center;">Field</th>
+<th style="text-align: left;">Description</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td align="center">policy_name</td>
-<td align="left">The <code>policy_name</code> field of the policy</td>
+<td style="text-align: center;">policy_name</td>
+<td style="text-align: left;">The <code>policy_name</code> field of the policy</td>
 </tr>
 <tr>
-<td align="center">policy_version</td>
-<td align="left">The <code>policy_version</code> triple <em>parsed</em> from the policy<sup>1</sup></td>
+<td style="text-align: center;">policy_version</td>
+<td style="text-align: left;">The <code>policy_version</code> triple <em>parsed</em> from the policy<sup>1</sup></td>
 </tr>
 <tr>
-<td align="center">sha1</td>
-<td align="left">A SHA128 flat hash of the entire policy. Can be used to identify a policy.</td>
+<td style="text-align: center;">sha1</td>
+<td style="text-align: left;">A SHA128 flat hash of the entire policy. Can be used to identify a policy.</td>
 </tr>
 </tbody>
 </table>
 <h2 id="policy-activation-enablement">Policy Activation / Enablement</h2>
-<pre><code class="auditd">AUDIT1809 IPE policy_name=&quot;AllowAll&quot; policy_version=0.0.0
+<pre><code class="language-auditd">AUDIT1809 IPE policy_name=&quot;AllowAll&quot; policy_version=0.0.0
 </code></pre>
-
 <p>This event is emitted when a policy is activated via the securityfs node,
 <code>/sys/kernel/security/ipe/policies/$policy_name/active</code>
 or when a policy is activated in place via
@@ -205,26 +200,25 @@ channel, and can be used to provide a record of when policies were made active.<
 <table>
 <thead>
 <tr>
-<th align="center">Field</th>
-<th align="left">Description</th>
+<th style="text-align: center;">Field</th>
+<th style="text-align: left;">Description</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td align="center">policy_name</td>
-<td align="left">The <code>policy_name</code> field of the policy</td>
+<td style="text-align: center;">policy_name</td>
+<td style="text-align: left;">The <code>policy_name</code> field of the policy</td>
 </tr>
 <tr>
-<td align="center">policy_version</td>
-<td align="left">The <code>policy_version</code> triple <em>parsed</em> from the policy<sup>1</sup></td>
+<td style="text-align: center;">policy_version</td>
+<td style="text-align: left;">The <code>policy_version</code> triple <em>parsed</em> from the policy<sup>1</sup></td>
 </tr>
 </tbody>
 </table>
 <h2 id="ipe-mode-switch">IPE Mode Switch</h2>
-<pre><code class="auditd">AUDIT1811 IPE mode=enforce
+<pre><code class="language-auditd">AUDIT1811 IPE mode=enforce
 AUDIT1811 IPE mode=permissive
 </code></pre>
-
 <p>This event is emitted when the IPE's mode of operation is changed through the <code>sysctl
 ipe.enforce</code>. It is emitted to the audit channel, additionally, this event is emitted
 early during system boot to the kernel channel (audit is not emitted) to identify
@@ -232,21 +226,20 @@ what mode IPE is started in.</p>
 <table>
 <thead>
 <tr>
-<th align="center">Field</th>
-<th align="left">Description</th>
+<th style="text-align: center;">Field</th>
+<th style="text-align: left;">Description</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td align="center">mode</td>
-<td align="left">The mode that IPE is set to. Can be either: <code>enforce</code> or <code>permissive</code>. See <a href="../#modes">the modes documentation for more information.</a></td>
+<td style="text-align: center;">mode</td>
+<td style="text-align: left;">The mode that IPE is set to. Can be either: <code>enforce</code> or <code>permissive</code>. See <a href="../#modes">the modes documentation for more information.</a></td>
 </tr>
 </tbody>
 </table>
 <h2 id="ipe-binary-event">IPE Binary Event</h2>
-<pre><code class="auditd">AUDIT1810 IPE ctx_pid=297 ctx_op=EXECUTE ctx_hook=EXEC ctx_comm=&quot;sysctl&quot; ctx_audit_pathname=&quot;/usr/lib/libc-2.30.so&quot; ctx_ino=135442 ctx_dev=vda prop_boot_verified=TRUE prop_dmverity_roothash=NULL prop_dmverity_signature=FALSE rule=&quot;DEFAULT action=DENY&quot;
+<pre><code class="language-auditd">AUDIT1810 IPE ctx_pid=297 ctx_op=EXECUTE ctx_hook=EXEC ctx_comm=&quot;sysctl&quot; ctx_audit_pathname=&quot;/usr/lib/libc-2.30.so&quot; ctx_ino=135442 ctx_dev=vda prop_boot_verified=TRUE prop_dmverity_roothash=NULL prop_dmverity_signature=FALSE rule=&quot;DEFAULT action=DENY&quot;
 </code></pre>
-
 <p>This event is emitted when IPE evaluates a binary. By default<sup>2</sup>, 
 it will only be triggered on "action=DENY" events, or "blocks". This event
 provides a record of execution that violated policy and can be used to identify
@@ -256,66 +249,66 @@ which identifes the error code when attempting to retrieve that value.</p>
 <table>
 <thead>
 <tr>
-<th align="center">Field</th>
-<th align="left">Description</th>
-<th align="center">Optional</th>
+<th style="text-align: center;">Field</th>
+<th style="text-align: left;">Description</th>
+<th style="text-align: center;">Optional</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td align="center"><code>ctx_pid</code></td>
-<td align="left">The <a href="https://en.wikipedia.org/wiki/Process_identifier">process ID</a> of the process being evaluated.</td>
-<td align="center">No</td>
+<td style="text-align: center;"><code>ctx_pid</code></td>
+<td style="text-align: left;">The <a href="https://en.wikipedia.org/wiki/Process_identifier">process ID</a> of the process being evaluated.</td>
+<td style="text-align: center;">No</td>
 </tr>
 <tr>
-<td align="center"><code>ctx_op</code></td>
-<td align="left">The operation that IPE is evaluating the file under. See <a href="../properties/#op">op</a>.</td>
-<td align="center">No</td>
+<td style="text-align: center;"><code>ctx_op</code></td>
+<td style="text-align: left;">The operation that IPE is evaluating the file under. See <a href="../properties/#op">op</a>.</td>
+<td style="text-align: center;">No</td>
 </tr>
 <tr>
-<td align="center"><code>ctx_hook</code></td>
-<td align="left">The LSM hook that the file is being evaluated under. Provides a more granular description that <code>ctx_op</code>.</td>
-<td align="center">No</td>
+<td style="text-align: center;"><code>ctx_hook</code></td>
+<td style="text-align: left;">The LSM hook that the file is being evaluated under. Provides a more granular description that <code>ctx_op</code>.</td>
+<td style="text-align: center;">No</td>
 </tr>
 <tr>
-<td align="center"><code>ctx_comm</code></td>
-<td align="left">The effective name of the process, as evaluated by the kernel.</td>
-<td align="center">No</td>
+<td style="text-align: center;"><code>ctx_comm</code></td>
+<td style="text-align: left;">The effective name of the process, as evaluated by the kernel.</td>
+<td style="text-align: center;">No</td>
 </tr>
 <tr>
-<td align="center"><code>ctx_audit_pathname</code></td>
-<td align="left">The effective absolute path to the file being evaluated. Walks past chroots and mount points.</td>
-<td align="center">Yes</td>
+<td style="text-align: center;"><code>ctx_audit_pathname</code></td>
+<td style="text-align: left;">The effective absolute path to the file being evaluated. Walks past chroots and mount points.</td>
+<td style="text-align: center;">Yes</td>
 </tr>
 <tr>
-<td align="center"><code>ctx_ino</code></td>
-<td align="left">The inode number of the file being evaluated.</td>
-<td align="center">Yes</td>
+<td style="text-align: center;"><code>ctx_ino</code></td>
+<td style="text-align: left;">The inode number of the file being evaluated.</td>
+<td style="text-align: center;">Yes</td>
 </tr>
 <tr>
-<td align="center"><code>ctx_dev</code></td>
-<td align="left">The device name that the file belongs to.</td>
-<td align="center">Yes</td>
+<td style="text-align: center;"><code>ctx_dev</code></td>
+<td style="text-align: left;">The device name that the file belongs to.</td>
+<td style="text-align: center;">Yes</td>
 </tr>
 <tr>
-<td align="center"><code>prop_boot_verified</code></td>
-<td align="left">The evaluation of the property, <code>boot_verified</code>. Can be ommitted if this property is not present in the kernel (not compiled in).</td>
-<td align="center">Yes</td>
+<td style="text-align: center;"><code>prop_boot_verified</code></td>
+<td style="text-align: left;">The evaluation of the property, <code>boot_verified</code>. Can be ommitted if this property is not present in the kernel (not compiled in).</td>
+<td style="text-align: center;">Yes</td>
 </tr>
 <tr>
-<td align="center"><code>prop_dmverity_roothash</code></td>
-<td align="left">The evaluation of the property, <code>dmverity_roothash</code>. Can be ommitted if this property is not present in the kernel (not compiled in).</td>
-<td align="center">Yes</td>
+<td style="text-align: center;"><code>prop_dmverity_roothash</code></td>
+<td style="text-align: left;">The evaluation of the property, <code>dmverity_roothash</code>. Can be ommitted if this property is not present in the kernel (not compiled in).</td>
+<td style="text-align: center;">Yes</td>
 </tr>
 <tr>
-<td align="center"><code>prop_dmverity_signature</code></td>
-<td align="left">The evaluation of the property, <code>dmverity_signature</code>. Can be ommitted if this property is not present in the kernel (not compiled in).</td>
-<td align="center">Yes</td>
+<td style="text-align: center;"><code>prop_dmverity_signature</code></td>
+<td style="text-align: left;">The evaluation of the property, <code>dmverity_signature</code>. Can be ommitted if this property is not present in the kernel (not compiled in).</td>
+<td style="text-align: center;">Yes</td>
 </tr>
 <tr>
-<td align="center"><code>rule</code></td>
-<td align="left">The plain-text approximation of the rule that was matched.</td>
-<td align="center">No</td>
+<td style="text-align: center;"><code>rule</code></td>
+<td style="text-align: left;">The plain-text approximation of the rule that was matched.</td>
+<td style="text-align: center;">No</td>
 </tr>
 </tbody>
 </table>
@@ -337,12 +330,14 @@ but is useful for debugging policies.</p></div>
                 <p>Copyright (c) Microsoft. All rights reserved.</p>
             <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
         </footer>
+        <script src="../../js/jquery-3.6.0.min.js"></script>
+        <script src="../../js/bootstrap.min.js"></script>
         <script>
             var base_url = "../..",
                 shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
         </script>
-        <script src="../../js/base.js" defer></script>
-        <script src="../../search/main.js" defer></script>
+        <script src="../../js/base.js"></script>
+        <script src="../../search/main.js"></script>
 
         <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
@@ -352,16 +347,13 @@ but is useful for debugging policies.</p></div>
                 <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
             </div>
             <div class="modal-body">
-                <p>
-                    From here you can search these documents. Enter
-                    your search terms below.
-                </p>
+                <p>From here you can search these documents. Enter your search terms below.</p>
                 <form>
                     <div class="form-group">
                         <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
                     </div>
                 </form>
-                <div id="mkdocs-search-results"></div>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
             </div>
             <div class="modal-footer">
             </div>

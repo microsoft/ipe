@@ -12,12 +12,9 @@
         <link href="../../css/bootstrap.min.css" rel="stylesheet">
         <link href="../../css/font-awesome.min.css" rel="stylesheet">
         <link href="../../css/base.css" rel="stylesheet">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
-
-        <script src="../../js/jquery-1.10.2.min.js" defer></script>
-        <script src="../../js/bootstrap.min.js" defer></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
-        <script>hljs.initHighlightingOnLoad();</script> 
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script>hljs.highlightAll();</script> 
     </head>
 
     <body>
@@ -164,13 +161,11 @@ can be done via:</p>
   -inkey &quot;$MY_PRIVATE_KEY&quot; -binary -outform der -noattr -nodetach \
   -out &quot;$MY_POLICY.p7s&quot;
 </code></pre>
-
 <p>Deploying the policies is done through securityfs, through the
 <code>new_policy</code> node. To deploy a policy, simply cat the file into the
 securityfs node:</p>
 <pre><code>cat &quot;$MY_POLICY.p7s&quot; &gt; /sys/kernel/security/ipe/new_policy
 </code></pre>
-
 <p>Upon success, this will create one subdirectory under
 <code>/sys/kernel/security/ipe/policies/</code>. The subdirectory will be the
 <code>policy_name</code> field of the policy deployed, so for the example above,
@@ -201,7 +196,6 @@ whatever policy is marked as active. For our example, we can activate
 the <code>Ex Policy</code> via:</p>
 <pre><code>   echo -n 1 &gt; &quot;/sys/kernel/security/ipe/Ex Policy/active&quot;
 </code></pre>
-
 <p>At which point, <code>Ex Policy</code> will now be the enforced policy on the
 system.</p>
 <h2 id="deleting-policies">Deleting Policies</h2>
@@ -210,7 +204,6 @@ system.</p>
 Writing <code>1</code> to that file will delete that node:</p>
 <pre><code>   echo -n 1 &gt; &quot;/sys/kernel/security/ipe/$policy_name/delete&quot;
 </code></pre>
-
 <p>There are two requirements to delete policies:</p>
 <ol>
 <li>The policy being deleted must not be the active policy.</li>
@@ -226,12 +219,14 @@ require <code>CAP_MAC_ADMIN</code>.</p></div>
                 <p>Copyright (c) Microsoft. All rights reserved.</p>
             <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
         </footer>
+        <script src="../../js/jquery-3.6.0.min.js"></script>
+        <script src="../../js/bootstrap.min.js"></script>
         <script>
             var base_url = "../..",
                 shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
         </script>
-        <script src="../../js/base.js" defer></script>
-        <script src="../../search/main.js" defer></script>
+        <script src="../../js/base.js"></script>
+        <script src="../../search/main.js"></script>
 
         <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
@@ -241,16 +236,13 @@ require <code>CAP_MAC_ADMIN</code>.</p></div>
                 <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
             </div>
             <div class="modal-body">
-                <p>
-                    From here you can search these documents. Enter
-                    your search terms below.
-                </p>
+                <p>From here you can search these documents. Enter your search terms below.</p>
                 <form>
                     <div class="form-group">
                         <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
                     </div>
                 </form>
-                <div id="mkdocs-search-results"></div>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
             </div>
             <div class="modal-footer">
             </div>
