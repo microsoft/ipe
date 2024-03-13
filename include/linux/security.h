@@ -83,6 +83,10 @@ enum lsm_event {
 	LSM_POLICY_CHANGE,
 };
 
+enum lsm_intgr_type {
+	__LSM_INTGR_MAX
+};
+
 /*
  * These are reasons that can be passed to the security_locked_down()
  * LSM hook. Lockdown reasons that protect kernel integrity (ie, the
@@ -511,6 +515,9 @@ int lsm_fill_user_ctx(struct lsm_ctx __user *uctx, u32 *uctx_len,
 		      void *val, size_t val_len, u64 id, u64 flags);
 int security_bdev_alloc(struct block_device *bdev);
 void security_bdev_free(struct block_device *bdev);
+int security_bdev_setintegrity(struct block_device *bdev,
+			       enum lsm_intgr_type type, const void *value,
+			       size_t size);
 #else /* CONFIG_SECURITY */
 
 static inline int call_blocking_lsm_notifier(enum lsm_event event, void *data)
@@ -1493,6 +1500,13 @@ static inline int security_bdev_alloc(struct block_device *bdev)
 
 static inline void security_bdev_free(struct block_device *bdev)
 {
+}
+
+static inline int security_bdev_setintegrity(struct block_device *bdev,
+					     enum lsm_intgr_type, type,
+					     const void *value, size_t size)
+{
+	return 0;
 }
 
 #endif	/* CONFIG_SECURITY */

@@ -5637,6 +5637,34 @@ void security_bdev_free(struct block_device *bdev)
 }
 EXPORT_SYMBOL(security_bdev_free);
 
+/**
+ * security_bdev_setintegrity() - Set the bdev's integrity data
+ * @bdev: block device
+ * @type: type of integrity, e.g. hash digest, signature, etc
+ * @value: the integrity value
+ * @size: size of the integrity value
+ *
+ * Register a verified integrity measurement of a bdev with the LSM.
+ *
+ * Return: Returns 0 on success, negative values on failure.
+ */
+int security_bdev_setintegrity(struct block_device *bdev,
+			       enum lsm_intgr_type type, const void *value,
+			       size_t size)
+{
+	int rc = 0;
+	struct security_hook_list *p;
+
+	hlist_for_each_entry(p, &security_hook_heads.bdev_setintegrity, list) {
+		rc = p->hook.bdev_setintegrity(bdev, type, value, size);
+		if (rc)
+			return rc;
+	}
+
+	return LSM_RET_DEFAULT(bdev_setintegrity);
+}
+EXPORT_SYMBOL(security_bdev_setintegrity);
+
 #ifdef CONFIG_PERF_EVENTS
 /**
  * security_perf_event_open() - Check if a perf event open is allowed
