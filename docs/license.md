@@ -1,12 +1,12 @@
 # Licensing for IPE
 
-Per compliance with the Linux kernel's source code license, the **kernel code** of IPE is licensed under the 
-GPLv2 License. The documentation, test suite, and tools contained within this repository are licensed under the 
+Per compliance with the Linux kernel's source code license, the **kernel code** of IPE is licensed under the
+GPLv2 License. The documentation, test suite, and tools contained within this repository are licensed under the
 following license:
 
 ## License
 
-Copyright (c) Microsoft All rights reserved.
+Copyright (c) 2020-2024 Microsoft All rights reserved.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 documentation files (the "Software"), to deal in the Software without restriction, including without limitation

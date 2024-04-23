@@ -1,5 +1,7 @@
 # Technical Diagrams
 
+**Note**: these diagrams are out of date, they will be updated once the patchset is accepted by the upstream.
+
 Left click on any image to view an image in it's original resolution.
 As these are SVGs, they will be significantly easier to read when enlarged.
 
