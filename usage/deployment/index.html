@@ -131,17 +131,7 @@
     <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
         <ul class="nav flex-column">
             
-            <li class="nav-item" data-level="2"><a href="#deploying-policies" class="nav-link">Deploying Policies</a>
-              <ul class="nav flex-column">
-              </ul>
-            </li>
-            
-            <li class="nav-item" data-level="2"><a href="#activating-policies" class="nav-link">Activating Policies</a>
-              <ul class="nav flex-column">
-              </ul>
-            </li>
-            
-            <li class="nav-item" data-level="2"><a href="#deleting-policies" class="nav-link">Deleting Policies</a>
+            <li class="nav-item" data-level="1"><a href="#deploying-policies" class="nav-link">Deploying Policies</a>
               <ul class="nav flex-column">
               </ul>
             </li>
@@ -150,67 +140,39 @@
 </div></div>
                     <div class="col-md-9" role="main">
 
-<h2 id="deploying-policies">Deploying Policies</h2>
-<p>User policies are policies that are deployed from userland, through securityfs. 
-These policies are signed to enforce some level of authorization of the policies 
-(prohibiting an attacker from gaining root, and deploying an "allow all" policy), 
-through the PKCS#7 enveloped data format. These policies must be signed by a certificate
-that chains to the <code>SYSTEM_TRUSTED_KEYRING</code>. Through openssl, the signing
-can be done via:</p>
-<pre><code>openssl smime -sign -in &quot;$MY_POLICY&quot; -signer &quot;$MY_CERTIFICATE&quot; \
-  -inkey &quot;$MY_PRIVATE_KEY&quot; -binary -outform der -noattr -nodetach \
-  -out &quot;$MY_POLICY.p7s&quot;
+<h1 id="deploying-policies">Deploying Policies</h1>
+<p>Policies can be deployed from userspace through securityfs. These policies are signed through the PKCS#7 message format to enforce some level of authorization of the policies (prohibiting an attacker from gaining unconstrained root, and deploying an "allow all" policy). These policies must be signed by a certificate that chains to the <code>SYSTEM_TRUSTED_KEYRING</code>. With openssl, the policy can be signed by:</p>
+<pre><code>openssl smime -sign \
+   -in &quot;$MY_POLICY&quot; \
+   -signer &quot;$MY_CERTIFICATE&quot; \
+   -inkey &quot;$MY_PRIVATE_KEY&quot; \
+   -noattr \
+   -nodetach \
+   -nosmimecap \
+   -outform der \
+   -out &quot;$MY_POLICY.p7b&quot;
 </code></pre>
-<p>Deploying the policies is done through securityfs, through the
-<code>new_policy</code> node. To deploy a policy, simply cat the file into the
-securityfs node:</p>
-<pre><code>cat &quot;$MY_POLICY.p7s&quot; &gt; /sys/kernel/security/ipe/new_policy
+<p>Deploying the policies is done through securityfs, through the <code>new_policy</code> node. To deploy a policy, simply cat the file into the securityfs node:</p>
+<pre><code>cat &quot;$MY_POLICY.p7b&quot; &gt; /sys/kernel/security/ipe/new_policy
 </code></pre>
-<p>Upon success, this will create one subdirectory under
-<code>/sys/kernel/security/ipe/policies/</code>. The subdirectory will be the
-<code>policy_name</code> field of the policy deployed, so for the example above,
-the directory will be <code>/sys/kernel/security/ipe/policies/Ex\ Policy</code>.
-Within this directory, there will be four files: <code>raw</code>, <code>content</code>,
-<code>active</code>, and <code>delete</code>.</p>
-<p>The <code>raw</code> file is rw, reading will provide the raw PKCS#7 data that
-was provided to the kernel, representing the policy. Writing, will deploy
-an in-place policy update - if this policy is the currently running policy,
-the new updated policy will replace it immediately upon success.</p>
-<p>The <code>content</code> file is read only. Reading will provide the PKCS#7 inner
-content of the policy, which will be the plain text policy.</p>
-<p>The <code>active</code> file is used to set a policy as the currently active policy.
-This file is rw, and accepts a value of <code>"1"</code> to set the policy as active.
-Since only a single policy can be active at one time, all other policies
-will be marked inactive.</p>
-<p>Similarly, the <code>cat</code> command above will result in an error upon
-syntactically invalid or untrusted policies. It will also error if a
-policy already exists with the same <code>policy_name</code>. The write to the <code>raw</code>
-node will error upon syntactically invalid, untrusted policies, or if the
-payload fails the version check. The write will also fail if the
-<code>policy_name</code> in the payload does not match the existing policy.</p>
-<h2 id="activating-policies">Activating Policies</h2>
-<p>Deploying these policies will <em>not</em> cause IPE to start enforcing this
-policy. Once deployment is successful, a policy can be marked as active,
-via <code>/sys/kernel/security/ipe/$policy_name/active</code>. IPE will enforce
-whatever policy is marked as active. For our example, we can activate
-the <code>Ex Policy</code> via:</p>
-<pre><code>   echo -n 1 &gt; &quot;/sys/kernel/security/ipe/Ex Policy/active&quot;
+<p>Upon success, this will create one subdirectory under <code>/sys/kernel/security/ipe/policies/</code>. The subdirectory will be the <code>policy_name</code> field of the policy deployed, so for the example above, the directory will be <code>/sys/kernel/security/ipe/policies/Ex_Policy</code>. Within this directory, there will be seven files: <code>pkcs7</code>, <code>policy</code>, <code>name</code>, <code>version</code>, <code>active</code>, <code>update</code>, and <code>delete</code>.</p>
+<p>The <code>pkcs7</code> file is read-only. Reading it returns the raw PKCS#7 data that was provided to the kernel, representing the policy. If the policy being read is the boot policy, this will return <code>ENOENT</code>, as it is not signed.</p>
+<p>The <code>policy</code> file is read only. Reading it returns the PKCS#7 inner content of the policy, which will be the plain text policy.</p>
+<p>The <code>active</code> file is used to set a policy as the currently active policy. This file is rw, and accepts a value of <code>"1"</code> to set the policy as active. Since only a single policy can be active at one time, all other policies will be marked inactive. The policy being marked active must have a policy version greater or equal to the currently-running version.</p>
+<p>The <code>update</code> file is used to update a policy that is already present in the kernel. This file is write-only and accepts a PKCS#7 signed policy. Two checks will always be performed on this policy: First, the <code>policy_names</code> must match with the updated version and the existing version. Second the updated policy must have a policy version greater than or equal to the currently-running version. This is to prevent rollback attacks.</p>
+<p>The <code>delete</code> file is used to remove a policy that is no longer needed. This file is write-only and accepts a value of <code>"1"</code> to delete the policy. On deletion, the securityfs node representing the policy will be removed. However, delete the current active policy is not allowed and will return an operation not permitted error.</p>
+<p>Similarly, writing to both <code>update</code> and <code>new_policy</code> could result in bad message(policy syntax error) or file exists error. The latter error happens when trying to deploy a policy with a <code>policy_name</code> while the kernel already has a deployed policy with the same <code>policy_name</code>.</p>
+<p>Deploying a policy will <em>not</em> cause IPE to start enforcing the policy. IPE will only enforce the policy marked active. Note that only one policy can be active at a time.</p>
+<p>Once deployment is successful, the policy can be activated, by writing file <code>/sys/kernel/security/ipe/policies/$policy_name/active</code>. For example, the <code>Ex_Policy</code> can be activated by:</p>
+<pre><code>echo 1 &gt; &quot;/sys/kernel/security/ipe/policies/Ex_Policy/active&quot;
 </code></pre>
-<p>At which point, <code>Ex Policy</code> will now be the enforced policy on the
-system.</p>
-<h2 id="deleting-policies">Deleting Policies</h2>
-<p>IPE also provides a way to delete policies. This can be done via the
-<code>delete</code> securityfs node, <code>/sys/kernel/security/ipe/$policy_name/delete</code>.
-Writing <code>1</code> to that file will delete that node:</p>
-<pre><code>   echo -n 1 &gt; &quot;/sys/kernel/security/ipe/$policy_name/delete&quot;
+<p>From above point on, <code>Ex_Policy</code> is now the enforced policy on the system.</p>
+<p>IPE also provides a way to delete policies. This can be done via the <code>delete</code> securityfs node, <code>/sys/kernel/security/ipe/policies/$policy_name/delete</code>. Writing <code>1</code> to that file deletes the policy:</p>
+<pre><code>echo 1 &gt; &quot;/sys/kernel/security/ipe/policies/$policy_name/delete&quot;
 </code></pre>
-<p>There are two requirements to delete policies:</p>
-<ol>
-<li>The policy being deleted must not be the active policy.</li>
-<li>The policy being deleted must not be the boot policy.</li>
-</ol>
-<p>NOTE: If a MAC system is enabled, all writes to ipe's securityfs nodes
-require <code>CAP_MAC_ADMIN</code>.</p></div>
+<p>There is only one requirement to delete a policy: the policy being deleted must be inactive.</p>
+<p><strong>NOTE:</strong></p>
+<p>If a traditional MAC system is enabled (SELinux, apparmor, smack), all writes to ipe's securityfs nodes require <code>CAP_MAC_ADMIN</code>.</p></div>
             </div>
         </div>
 

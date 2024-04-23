@@ -137,11 +137,11 @@
               <ul class="nav flex-column">
               </ul>
             </li>
-            <li class="nav-item" data-level="2"><a href="#allow-only-initial-superblock" class="nav-link">Allow only initial superblock</a>
+            <li class="nav-item" data-level="2"><a href="#allow-only-initramfs" class="nav-link">Allow only initramfs</a>
               <ul class="nav flex-column">
               </ul>
             </li>
-            <li class="nav-item" data-level="2"><a href="#allow-any-signed-dm-verity-volume-and-the-initial-superblock" class="nav-link">Allow any signed dm-verity volume and the initial superblock</a>
+            <li class="nav-item" data-level="2"><a href="#allow-any-signed-dm-verity-volume-and-the-initramfs" class="nav-link">Allow any signed dm-verity volume and the initramfs</a>
               <ul class="nav flex-column">
               </ul>
             </li>
@@ -150,6 +150,14 @@
               </ul>
             </li>
             <li class="nav-item" data-level="2"><a href="#allow-only-a-specific-dm-verity-volume" class="nav-link">Allow only a specific dm-verity volume</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#allow-any-signed-fs-verity-file" class="nav-link">Allow any signed fs-verity file</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#prohibit-execution-of-a-specific-fs-verity-file" class="nav-link">Prohibit execution of a specific fs-verity file</a>
               <ul class="nav flex-column">
               </ul>
             </li>
@@ -162,35 +170,50 @@
 
 <h1 id="policy-examples">Policy Examples</h1>
 <h2 id="allow-all">Allow all</h2>
-<pre><code>policy_name=&quot;Allow All&quot; policy_version=0.0.0
+<pre><code>policy_name=Allow_All policy_version=0.0.0
 DEFAULT action=ALLOW
 </code></pre>
-<h2 id="allow-only-initial-superblock">Allow only initial superblock</h2>
-<pre><code>policy_name=&quot;Allow All Initial SB&quot; policy_version=0.0.0
+<h2 id="allow-only-initramfs">Allow only initramfs</h2>
+<pre><code>policy_name=Allow_All_Initramfs policy_version=0.0.0
 DEFAULT action=DENY
 
 op=EXECUTE boot_verified=TRUE action=ALLOW
 </code></pre>
-<h2 id="allow-any-signed-dm-verity-volume-and-the-initial-superblock">Allow any signed dm-verity volume and the initial superblock</h2>
-<pre><code>policy_name=&quot;AllowSignedAndInitial&quot; policy_version=0.0.0
+<h2 id="allow-any-signed-dm-verity-volume-and-the-initramfs">Allow any signed dm-verity volume and the initramfs</h2>
+<pre><code>policy_name=AllowSignedAndInitramfs policy_version=0.0.0
 DEFAULT action=DENY
 
 op=EXECUTE boot_verified=TRUE action=ALLOW
 op=EXECUTE dmverity_signature=TRUE action=ALLOW
 </code></pre>
 <h2 id="prohibit-execution-from-a-specific-dm-verity-volume">Prohibit execution from a specific dm-verity volume</h2>
-<pre><code>policy_name=&quot;AllowSignedAndInitial&quot; policy_version=0.0.0
+<pre><code>policy_name=AllowSignedAndInitramfs policy_version=0.0.0
 DEFAULT action=DENY
 
-op=EXECUTE dmverity_roothash=401fcec5944823ae12f62726e8184407a5fa9599783f030dec146938 action=DENY
+op=EXECUTE dmverity_roothash=sha256:cd2c5bae7c6c579edaae4353049d58eb5f2e8be0244bf05345bc8e5ed257baff action=DENY
+
 op=EXECUTE boot_verified=TRUE action=ALLOW
 op=EXECUTE dmverity_signature=TRUE action=ALLOW
 </code></pre>
 <h2 id="allow-only-a-specific-dm-verity-volume">Allow only a specific dm-verity volume</h2>
-<pre><code>policy_name=&quot;AllowSignedAndInitial&quot; policy_version=0.0.0
+<pre><code>policy_name=AllowSignedAndInitramfs policy_version=0.0.0
 DEFAULT action=DENY
 
-op=EXECUTE dmverity_roothash=401fcec5944823ae12f62726e8184407a5fa9599783f030dec146938 action=ALLOW
+op=EXECUTE dmverity_roothash=sha256:401fcec5944823ae12f62726e8184407a5fa9599783f030dec146938 action=ALLOW
+</code></pre>
+<h2 id="allow-any-signed-fs-verity-file">Allow any signed fs-verity file</h2>
+<pre><code>policy_name=AllowSignedFSVerity policy_version=0.0.0
+DEFAULT action=DENY
+
+op=EXECUTE fsverity_signature=TRUE action=ALLOW
+</code></pre>
+<h2 id="prohibit-execution-of-a-specific-fs-verity-file">Prohibit execution of a specific fs-verity file</h2>
+<pre><code>policy_name=ProhibitSpecificFSVF policy_version=0.0.0
+DEFAULT action=DENY
+
+op=EXECUTE fsverity_digest=sha256:fd88f2b8824e197f850bf4c5109bea5cf0ee38104f710843bb72da796ba5af9e action=DENY
+op=EXECUTE boot_verified=TRUE action=ALLOW
+op=EXECUTE dmverity_signature=TRUE action=ALLOW
 </code></pre></div>
             </div>
         </div>

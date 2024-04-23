@@ -131,16 +131,13 @@
     <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
         <ul class="nav flex-column">
             
-            <li class="nav-item" data-level="1"><a href="#ipe-policy" class="nav-link">IPE Policy</a>
-              <ul class="nav flex-column">
-            <li class="nav-item" data-level="2"><a href="#early-user-mode-protection" class="nav-link">Early user-mode protection</a>
+            <li class="nav-item" data-level="1"><a href="#policy" class="nav-link">Policy</a>
               <ul class="nav flex-column">
               </ul>
             </li>
-            <li class="nav-item" data-level="2"><a href="#modes" class="nav-link">Modes</a>
+            
+            <li class="nav-item" data-level="1"><a href="#modes" class="nav-link">Modes</a>
               <ul class="nav flex-column">
-              </ul>
-            </li>
               </ul>
             </li>
         </ul>
@@ -148,82 +145,36 @@
 </div></div>
                     <div class="col-md-9" role="main">
 
-<h1 id="ipe-policy">IPE Policy</h1>
-<p>The most essential part of IPE is its customizable policy which allows users 
-to specify the rules that the LSM should enforce for different operations. 
-This policy is designed to be both forward compatible and backwards compatible.
-There is one required line, at the top of the policy, indicating the
-policy name, and the policy version, for instance:</p>
-<pre><code>policy_name=&quot;Ex Policy&quot; policy_version=0.0.0
-</code></pre>
-<p>The policy name is a unique key identifying this policy in a human readable
-name. This is used to create nodes under securityfs as well as uniquely
-identify policies to deploy new policies vs update existing policies.</p>
-<p>The policy version indicates the current version of the policy (NOT the
-policy syntax version). This is used to prevent roll-back of policy to
-potentially insecure previous versions of the policy.</p>
-<p>The next portion of IPE policy, are rules. Rules are formed by key=value
-pairs, known as properties. IPE rules require two properties: "action",
-which determines what IPE does when it encounters a match against the
-rule, and "op", which determines when that rule should be evaluated.
-Thus, a minimal rule is:</p>
-<pre><code>op=EXECUTE action=ALLOW
-</code></pre>
-<p>This example will allow any execution. Additional properties are used to
-restrict attributes about the files being evaluated. These properties are
-intended to be deterministic attributes that are resident in the kernel.</p>
-<p>Order does not matter for the rule's properties - they can be listed in
-any order, however it is encouraged to have the "op" property be first,
-and the "action" property be last for readability. Rules are evaluated
-top-to-bottom. As a result, any revocation rules, or denies should be
-placed early in the file to ensure that these rules are evaluated before as
-rule with "action=ALLOW" is hit.</p>
-<p>Any unrecognized syntax in the policy will result in a fatal error to
-parse the policy. IPE policy supports comments. The character '#' will
-function as a  comment, ignoring all characters to the right of '#'
-until the newline.</p>
-<p>The default behavior of IPE evaluations can also be expressed in policy,
-through the <code>DEFAULT</code> statement. This can be done at a global level, or
-a per-operation level:</p>
-<pre><code># Global
+<h1 id="policy">Policy</h1>
+<p>IPE policy is a plain-text policy composed of multiple statements over several lines. There is one required line, at the top of the policy, indicating the policy name, and the policy version, for instance:</p>
+<p><code>policy_name=Ex_Policy policy_version=0.0.0</code></p>
+<p>The policy name is a unique key identifying this policy in a human readable name. This is used to create nodes under securityfs as well as uniquely identify policies to deploy new policies vs update existing policies.</p>
+<p>The policy version indicates the current version of the policy (NOT the policy syntax version). This is used to prevent rollback of policy to potentially insecure previous versions of the policy.</p>
+<p>The next portion of IPE policy are rules. Rules are formed by key=value pairs, known as properties. IPE rules require two properties: <code>action</code>, which determines what IPE does when it encounters a match against the rule, and <code>op</code>, which determines when the rule should be evaluated. The ordering is significant, a rule must start with <code>op</code>, and end with <code>action</code>. Thus, a minimal rule is:</p>
+<p><code>op=EXECUTE action=ALLOW</code></p>
+<p>This example will allow any execution. Additional properties are used to assess immutable security properties about the files being evaluated. These properties are intended to be descriptions of systems within the kernel that can provide a measure of integrity verification, such that IPE can determine the trust of the resource based on the value of the property.</p>
+<p>Rules are evaluated top-to-bottom. As a result, any revocation rules, or denies should be placed early in the file to ensure that these rules are evaluated before a rule with <code>action=ALLOW</code>.</p>
+<p>IPE policy supports comments. The character '#' will function as a comment, ignoring all characters to the right of '#' until the newline.</p>
+<p>The default behavior of IPE evaluations can also be expressed in policy, through the <code>DEFAULT</code> statement. This can be done at a global level, or a per-operation level:</p>
+<pre><code>#Global
 DEFAULT action=ALLOW
 
-# Operation Specific
+#Operation Specific
 DEFAULT op=EXECUTE action=ALLOW
 </code></pre>
-<p>A DEFAULT operation must be set for all understood
-operations within IPE. For policies to remain completely forwards
-compatible, it is recommended that users add a <code>DEFAULT action=ALLOW</code>
-and override the defaults on a per-operation basis.</p>
-<h2 id="early-user-mode-protection">Early user-mode protection</h2>
-<p>With configurable policy-based LSMs, there's several issues with enforcing
-the configurable policies at startup, around reading and parsing the policy:</p>
+<p>A default must be set for all known operations in IPE. If you want to preserve older policies being compatible with newer kernels that can introduce new operations, set a global default of <code>ALLOW</code>, then override the defaults on a per-operation basis (as above).</p>
+<p>With configurable policy-based LSMs, there's several issues with enforcing the configurable policies at startup, around reading and parsing the policy:</p>
 <ol>
-<li>The kernel <em>should</em> not read files from userland, so directly reading
-the policy file is prohibited.</li>
-<li>The kernel command line has a character limit, and one kernel module
-should not reserve the entire character limit for its own configuration.</li>
-<li>There are various boot loaders in the kernel ecosystem, so handing off
-a memory block would be costly to maintain.</li>
+<li>The kernel <em>should</em> not read files from userspace, so directly reading the policy file is prohibited.</li>
+<li>The kernel command line has a character limit, and one kernel module should not reserve the entire character limit for its own configuration.</li>
+<li>There are various boot loaders in the kernel ecosystem, so handing off a memory block would be costly to maintain.</li>
 </ol>
-<p>As a result, IPE has addressed this problem through a concept of a "boot
-policy". A boot policy is a minimal policy, compiled into the kernel. This
-policy is intended to get the system to a state where userland is setup
-and ready to receive commands, at which point a more complex policy ("user policies")
-can be deployed via securityfs. The boot policy can be specified via the
-Kconfig, <code>SECURITY_IPE_BOOT_POLICY</code>, which accepts a path to a plain-text
-version of the IPE policy to apply. This policy will be compiled into the
-kernel. If not specified, IPE will be disabled until a policy is deployed
-through securityfs, and activated through sysfs.</p>
-<h2 id="modes">Modes</h2>
-<p>IPE, similar to SELinux, supports two modes of operation: permissive
-and enforce. Permissive mode performs the same checks as enforce mode,
-and logs policy violations, but will not enforce the policy. This allows
-users to test policies before enforcing them.</p>
-<p>The default mode is enforce, and can be changed via the kernel command line
-parameter <code>ipe.enforce=(0|1)</code>, or the securityfs node,
-<code>/sys/kernel/security/ipe/enforce</code>. The ability to switch modes can be compiled
-out of the LSM via setting the Kconfig <code>CONFIG_SECURITY_IPE_PERMISSIVE_SWITCH</code> to N.</p></div>
+<p>As a result, IPE has addressed this problem through a concept of a "boot policy". A boot policy is a minimal policy which is compiled into the kernel. This policy is intended to get the system to a state where userspace is set up and ready to receive commands, at which point a more complex policy can be deployed via securityfs. The boot policy can be specified via <code>SECURITY_IPE_BOOT_POLICY</code> config option, which accepts a path to a plain-text version of the IPE policy to apply. This policy will be compiled into the kernel. If not specified, IPE will be disabled until a policy is deployed and activated through securityfs.</p>
+<h1 id="modes">Modes</h1>
+<p>IPE supports two modes of operation: permissive (similar to SELinux's permissive mode) and enforced. In permissive mode, all events are checked and policy violations are logged, but the policy is not really enforced. This allows users to test policies before enforcing them.</p>
+<p>The default mode is enforce, and can be changed via the kernel command line parameter <code>ipe.enforce=(0|1)</code>, or the securityfs node <code>/sys/kernel/security/ipe/enforce</code>.</p>
+<p><strong>NOTE:</strong></p>
+<p>If a traditional MAC system is enabled (SELinux, apparmor, smack, etcetera), all writes to ipe's securityfs nodes require <code>CAP_MAC_ADMIN</code>.</p></div>
             </div>
         </div>
 

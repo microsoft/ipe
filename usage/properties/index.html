@@ -153,6 +153,14 @@
               <ul class="nav flex-column">
               </ul>
             </li>
+            <li class="nav-item" data-level="2"><a href="#fsverity_digest" class="nav-link">fsverity_digest</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#fsverity_signature" class="nav-link">fsverity_signature</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
               </ul>
             </li>
         </ul>
@@ -161,109 +169,151 @@
                     <div class="col-md-9" role="main">
 
 <h1 id="ipe-properties">IPE Properties</h1>
-<p>IPE properties are <code>key=value</code> pairs expressed in IPE policy.
-These properties can be used in rules within IPE policy to control
-the evaluation of binaries and files on the system IPE is protecting.</p>
-<p>This page contains a listing of all currently supported properties within
-IPE, and a description of the available values for each property.</p>
-<p>Usermode can interrogate the kernel via <code>/sys/kernel/security/ipe/property_config</code>
-which, when read, will return a string of form:</p>
-<pre><code>Property1=Version1
-Property2=Version2
-.
-.
-.
-PropertyN=VersionN
-</code></pre>
-<p>For all properties that IPE is configured to understand.</p>
+<p>IPE properties are <code>key=value</code> pairs expressed in IPE
+policy. Two properties are built into the policy parser: 'op' and 'action'.
+The other properties are used to restrict immutable security properties
+about the files being evaluated. Currently those properties are:
+<code>boot_verified</code>, <code>dmverity_signature</code>, <code>dmverity_roothash</code>,
+<code>fsverity_signature</code>, <code>fsverity_digest</code>. A description of all
+properties supported by IPE are listed below:</p>
 <h2 id="op">op</h2>
-<h3 id="version-1">Version 1</h3>
-<p>Indicates the operation for a rule to apply to. Must be in every rule. IPE
-supports the following operations:</p>
-<p><code>EXECUTE</code></p>
-<blockquote>
-<p>Pertains to any file attempting to be executed, or loaded as an executable.</p>
-</blockquote>
-<p><code>FIRMWARE</code>:</p>
-<blockquote>
-<p>Pertains to firmware being loaded via the firmware_class interface. This
-covers both the preallocated buffer and the firmware file itself.</p>
-</blockquote>
-<p><code>KMODULE</code>:</p>
-<blockquote>
+<p>Indicates the operation for a rule to apply to. Must be in every rule,
+as the first token. IPE supports the following operations:</p>
+<ul>
+<li><strong>EXECUTE</strong></li>
+<li>
+<p>Pertains to any file attempting to be executed, or loaded as an
+    executable.</p>
+</li>
+<li>
+<p><strong>FIRMWARE</strong>:</p>
+</li>
+<li>
+<p>Pertains to firmware being loaded via the firmware_class interface.
+    This covers both the preallocated buffer and the firmware file
+    itself.</p>
+</li>
+<li>
+<p><strong>KMODULE</strong>:</p>
+</li>
+<li>
 <p>Pertains to loading kernel modules via <code>modprobe</code> or <code>insmod</code>.</p>
-</blockquote>
-<p><code>KEXEC_IMAGE</code>:</p>
-<blockquote>
+</li>
+<li>
+<p><strong>KEXEC_IMAGE</strong>:</p>
+</li>
+<li>
 <p>Pertains to kernel images loading via <code>kexec</code>.</p>
-</blockquote>
-<p><code>KEXEC_INITRAMFS</code></p>
-<blockquote>
+</li>
+<li>
+<p><strong>KEXEC_INITRAMFS</strong></p>
+</li>
+<li>
 <p>Pertains to initrd images loading via <code>kexec --initrd</code>.</p>
-</blockquote>
-<p><code>POLICY</code>:</p>
-<blockquote>
-<p>Controls loading IMA policies through the <code>/sys/kernel/security/ima/policy</code>
-securityfs entry.</p>
-</blockquote>
-<p><code>X509_CERT</code>:</p>
-<blockquote>
-<p>Controls loading IMA certificates through the Kconfigs, <code>CONFIG_IMA_X509_PATH</code>
-and <code>CONFIG_EVM_X509_PATH</code>.</p>
-</blockquote>
-<p><code>KERNEL_READ</code>:</p>
-<blockquote>
-<p>Short-hand for the following operations: <code>FIRMWARE</code>, <code>KMODULE</code>,
-<code>KEXEC_IMAGE</code>, <code>KEXEC_INITRAMFS</code>, <code>POLICY</code>, and <code>X509_CERTIFICATE</code></p>
-</blockquote>
+</li>
+<li>
+<p><strong>POLICY</strong>:</p>
+</li>
+<li>
+<p>Controls loading policies via reading a kernel-space initiated read.
+    An example of such is loading IMA policies by writing the path
+    to the policy file to <code>$securityfs/ima/policy</code>.</p>
+</li>
+<li>
+<p><strong>X509_CERT</strong>:</p>
+</li>
+<li>Controls loading IMA certificates through the Kconfigs,
+    <code>CONFIG_IMA_X509_PATH</code> and <code>CONFIG_EVM_X509_PATH</code>.</li>
+</ul>
 <h2 id="action">action</h2>
-<h3 id="version-1_1">Version 1</h3>
-<p>Determines what IPE should do when a rule matches. Must be in every rule. Can be one of:</p>
-<p><code>ALLOW</code>:</p>
-<blockquote>
-<p>If the rule matches, explicitly allow the call to proceed without executing any more rules.</p>
-</blockquote>
-<p><code>DENY</code>:</p>
-<blockquote>
-<p>If the rule matches, explicitly prohibit the call from proceeding without
-executing any more rules.</p>
-</blockquote>
+<p>Determines what IPE should do when a rule matches. Must be in every
+rule, as the final clause. Can be one of:</p>
+<ul>
+<li><strong>ALLOW</strong>:</li>
+<li>
+<p>If the rule matches, explicitly allow access to the resource to proceed
+    without executing any more rules.</p>
+</li>
+<li>
+<p><strong>DENY</strong>:</p>
+</li>
+<li>If the rule matches, explicitly prohibit access to the resource to
+    proceed without executing any more rules.</li>
+</ul>
 <h2 id="boot_verified">boot_verified</h2>
-<h3 id="version-1_2">Version 1</h3>
-<p>This property can be utilized for authorization of the first
-super-block that is mounted on the system, where IPE attempts
-to evaluate a file. Typically this is used for systems with
-an initramfs or other initial disk, where this is unmounted before
-the system becomes available, and is not covered by any other property.
-This property is enabled by the Kconfig, <code>CONFIG_IPE_BOOT_PROP</code>.
+<p>This property can be utilized for authorization of files from initramfs.
 The format of this property is:</p>
-<pre><code>    boot_verified=(TRUE|FALSE)
+<pre><code>boot_verified=(TRUE|FALSE)
 </code></pre>
-<blockquote>
-<p>WARNING: This property will trust any disk where the first IPE
-evaluation occurs. If you do not have a startup disk that is
-unpacked and unmounted (like initramfs), then it will automatically
-trust the root filesystem and potentially overauthorize the entire
-disk.</p>
-</blockquote>
+<p><strong>WARNING:</strong></p>
+<p>This property will trust files from initramfs(rootfs). It should
+only be used during the early booting stage. Before mounting the real
+rootfs on top of the initramfs, initramfs script will recursively
+remove all files and directories on the initramfs. This is typically
+implemented by using switch_root(8). Therefore the initramfs will be empty and not accessible after the real
+rootfs takes over. It is advised to switch to a different policy
+that doesn't rely on the property after this point.
+This ensures that the trust policies remain relevant and effective
+throughout the system's operation.</p>
 <h2 id="dmverity_roothash">dmverity_roothash</h2>
-<h3 id="version-1_3">Version 1</h3>
 <p>This property can be utilized for authorization or revocation of
-specific dm-verity volumes, identified via root hash. It has a
-dependency on the DM_VERITY module. This property is enabled by
-the property: <code>CONFIG_IPE_DM_VERITY_ROOTHASH</code>. The format of this
-property is:</p>
-<pre><code>dmverity_roothash=HashHexDigest
+specific dm-verity volumes, identified via its root hash. It has a
+dependency on the DM_VERITY module. This property is controlled by
+the <code>IPE_PROP_DM_VERITY</code> config option, it will be automatically
+selected when <code>IPE_SECURITY</code>, <code>DM_VERITY</code> and
+<code>DM_VERITY_VERIFY_ROOTHASH_SIG</code> are all enabled.
+The format of this property is:</p>
+<pre><code>dmverity_roothash=DigestName:HexadecimalString
 </code></pre>
+<p>The supported DigestNames for dmverity_roothash are:</p>
+<ul>
+<li>blake2b-512</li>
+<li>blake2s-256</li>
+<li>sha1</li>
+<li>sha256</li>
+<li>sha384</li>
+<li>sha512</li>
+<li>sha3-224</li>
+<li>sha3-256</li>
+<li>sha3-384</li>
+<li>sha3-512</li>
+<li>md4</li>
+<li>md5</li>
+<li>sm3</li>
+<li>rmd160</li>
+</ul>
 <h2 id="dmverity_signature">dmverity_signature</h2>
-<h3 id="version-1_4">Version 1</h3>
 <p>This property can be utilized for authorization of all dm-verity
-volumes that have a signed roothash that chains to the system
-trusted keyring. It has a dependency on the
-<code>DM_VERITY_VERIFY_ROOTHASH_SIG</code> Kconfig. This property is enabled by
-the Kconfig: <code>CONFIG_IPE_DM_VERITY_SIGNATURE</code>.
+volumes that have a signed roothash that validated by a keyring
+specified by dm-verity's configuration, either the system trusted
+keyring, or the secondary keyring. It depends on
+<code>DM_VERITY_VERIFY_ROOTHASH_SIG</code> config option and is controlled by
+the <code>IPE_PROP_DM_VERITY</code> config option, it will be automatically
+selected when <code>IPE_SECURITY</code>, <code>DM_VERITY</code> and
+<code>DM_VERITY_VERIFY_ROOTHASH_SIG</code> are all enabled.
 The format of this property is:</p>
 <pre><code>dmverity_signature=(TRUE|FALSE)
+</code></pre>
+<h2 id="fsverity_digest">fsverity_digest</h2>
+<p>This property can be utilized for authorization or revocation of
+specific fsverity enabled file, identified via its fsverity digest.
+It depends on <code>FS_VERITY</code> config option and is controlled by
+<code>CONFIG_IPE_PROP_FS_VERITY</code>. The format of this property is:</p>
+<pre><code>fsverity_digest=DigestName:HexadecimalString
+</code></pre>
+<p>The supported DigestNames for fsverity_roothash are:</p>
+<ul>
+<li>sha256</li>
+<li>sha512</li>
+</ul>
+<h2 id="fsverity_signature">fsverity_signature</h2>
+<p>This property is used to authorize all fs-verity enabled files that have
+been verified by fs-verity's built-in signature mechanism. The signature
+verification relies on a key stored within the ".fs-verity" keyring. It
+depends on <code>CONFIG_FS_VERITY_BUILTIN_SIGNATURES</code> and it is controlled by
+the Kconfig <code>CONFIG_IPE_PROP_FS_VERITY</code>. The format of this
+property is:</p>
+<pre><code>fsverity_signature=(TRUE|FALSE)
 </code></pre></div>
             </div>
         </div>

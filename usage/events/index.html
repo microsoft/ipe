@@ -133,19 +133,23 @@
             
             <li class="nav-item" data-level="1"><a href="#audit-events" class="nav-link">Audit Events</a>
               <ul class="nav flex-column">
-            <li class="nav-item" data-level="2"><a href="#policy-load-staging" class="nav-link">Policy Load / Staging</a>
+            <li class="nav-item" data-level="2"><a href="#1420-audit_ipe_access" class="nav-link">1420 AUDIT_IPE_ACCESS</a>
               <ul class="nav flex-column">
               </ul>
             </li>
-            <li class="nav-item" data-level="2"><a href="#policy-activation-enablement" class="nav-link">Policy Activation / Enablement</a>
+            <li class="nav-item" data-level="2"><a href="#1421-audit_ipe_config_change" class="nav-link">1421 AUDIT_IPE_CONFIG_CHANGE</a>
               <ul class="nav flex-column">
               </ul>
             </li>
-            <li class="nav-item" data-level="2"><a href="#ipe-mode-switch" class="nav-link">IPE Mode Switch</a>
+            <li class="nav-item" data-level="2"><a href="#1422-audit_ipe_policy_load" class="nav-link">1422 AUDIT_IPE_POLICY_LOAD</a>
               <ul class="nav flex-column">
               </ul>
             </li>
-            <li class="nav-item" data-level="2"><a href="#ipe-binary-event" class="nav-link">IPE Binary Event</a>
+            <li class="nav-item" data-level="2"><a href="#1404-audit_mac_status" class="nav-link">1404 AUDIT_MAC_STATUS</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#success-auditing" class="nav-link">Success Auditing</a>
               <ul class="nav flex-column">
               </ul>
             </li>
@@ -157,171 +161,308 @@
                     <div class="col-md-9" role="main">
 
 <h1 id="audit-events">Audit Events</h1>
-<p>IPE will emit a several forms of messages to the audit channel. This section
-provides various information about these events and the descriptions of the
-fields that are emitted by these events to help with analysis of audit logs.</p>
-<h2 id="policy-load-staging">Policy Load / Staging</h2>
-<pre><code class="language-auditd">AUDIT1808 IPE policy_name=&quot;AllowAll&quot; policy_version=0.0.0 sha1=776FA5945C012EDDFC0866D7E3DE883CC0B67930
+<h2 id="1420-audit_ipe_access">1420 AUDIT_IPE_ACCESS</h2>
+<p>Event Examples:</p>
+<pre><code>type=1420 audit(1653364370.067:61): ipe_op=EXECUTE ipe_hook=MMAP enforcing=1 pid=2241 comm=&quot;ld-linux.so&quot; path=&quot;/deny/lib/libc.so.6&quot; dev=&quot;sda2&quot; ino=14549020 rule=&quot;DEFAULT action=DENY&quot;
+type=1300 audit(1653364370.067:61): SYSCALL arch=c000003e syscall=9 success=no exit=-13 a0=7f1105a28000 a1=195000 a2=5 a3=812 items=0 ppid=2219 pid=2241 auid=0 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=pts0 ses=2 comm=&quot;ld-linux.so&quot; exe=&quot;/tmp/ipe-test/lib/ld-linux.so&quot; subj=unconfined key=(null)
+type=1327 audit(1653364370.067:61): 707974686F6E3300746573742F6D61696E2E7079002D6E00
+
+type=1420 audit(1653364735.161:64): ipe_op=EXECUTE ipe_hook=MMAP enforcing=1 pid=2472 comm=&quot;mmap_test&quot; path=? dev=? ino=? rule=&quot;DEFAULT action=DENY&quot;
+type=1300 audit(1653364735.161:64): SYSCALL arch=c000003e syscall=9 success=no exit=-13 a0=0 a1=1000 a2=4 a3=21 items=0 ppid=2219 pid=2472 auid=0 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=pts0 ses=2 comm=&quot;mmap_test&quot; exe=&quot;/root/overlake_test/upstream_test/vol_fsverity/bin/mmap_test&quot; subj=unconfined key=(null)
+type=1327 audit(1653364735.161:64): 707974686F6E3300746573742F6D61696E2E7079002D6E00
 </code></pre>
-<p>This event is emitted when a policy is loaded via <code>$SECURITYFS/ipe/new_policy</code>
-or <code>$SECURITYFS/ipe/policies/&lt;policy_name&gt;/raw</code>. It is emitted to the audit
-channel, and can be used to provide a record of what policies were loaded
-on the system.</p>
+<p>This event indicates that IPE made an access control decision; the IPE specific record (1420) is always emitted in conjunction with a <code>AUDITSYSCALL</code> record.</p>
+<p>Determining whether IPE is in permissive or enforced mode can be derived from <code>success</code> property and exit code of the <code>AUDITSYSCALL</code> record.</p>
+<p>Field descriptions:</p>
 <table>
 <thead>
 <tr>
-<th style="text-align: center;">Field</th>
-<th style="text-align: left;">Description</th>
+<th>Field</th>
+<th>Value Type</th>
+<th>Optional?</th>
+<th>Description of Value</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td style="text-align: center;">policy_name</td>
-<td style="text-align: left;">The <code>policy_name</code> field of the policy</td>
+<td>ipe_op</td>
+<td>string</td>
+<td>No</td>
+<td>The IPE operation name associated with the log</td>
 </tr>
 <tr>
-<td style="text-align: center;">policy_version</td>
-<td style="text-align: left;">The <code>policy_version</code> triple <em>parsed</em> from the policy<sup>1</sup></td>
+<td>ipe_hook</td>
+<td>string</td>
+<td>No</td>
+<td>The name of the LSM hook that triggered the IPE event</td>
 </tr>
 <tr>
-<td style="text-align: center;">sha1</td>
-<td style="text-align: left;">A SHA128 flat hash of the entire policy. Can be used to identify a policy.</td>
+<td>enforcing</td>
+<td>integer</td>
+<td>No</td>
+<td>The current IPE enforcing state 1 is in enforcing mode, 0 is in permissive mode</td>
+</tr>
+<tr>
+<td>pid</td>
+<td>integer</td>
+<td>No</td>
+<td>The pid of the process that triggered the IPE event.</td>
+</tr>
+<tr>
+<td>comm</td>
+<td>string</td>
+<td>No</td>
+<td>The command line program name of the process that triggered the IPE event</td>
+</tr>
+<tr>
+<td>path</td>
+<td>string</td>
+<td>Yes</td>
+<td>The absolute path to the evaluated file</td>
+</tr>
+<tr>
+<td>ino</td>
+<td>integer</td>
+<td>Yes</td>
+<td>The inode number of the evaluated file</td>
+</tr>
+<tr>
+<td>dev</td>
+<td>string</td>
+<td>Yes</td>
+<td>The device name of the evaluated file, e.g. vda</td>
+</tr>
+<tr>
+<td>rule</td>
+<td>string</td>
+<td>No</td>
+<td>The matched policy rule</td>
 </tr>
 </tbody>
 </table>
-<h2 id="policy-activation-enablement">Policy Activation / Enablement</h2>
-<pre><code class="language-auditd">AUDIT1809 IPE policy_name=&quot;AllowAll&quot; policy_version=0.0.0
+<h2 id="1421-audit_ipe_config_change">1421 AUDIT_IPE_CONFIG_CHANGE</h2>
+<p>Event Example:</p>
+<pre><code>type=1421 audit(1653425583.136:54): old_active_pol_name=&quot;Allow_All&quot; old_active_pol_version=0.0.0 old_policy_digest=sha256:E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855 new_active_pol_name=&quot;boot_verified&quot; new_active_pol_version=0.0.0 new_policy_digest=sha256:820EEA5B40CA42B51F68962354BA083122A20BB846F26765076DD8EED7B8F4DB auid=4294967295 ses=4294967295 lsm=ipe res=1
+type=1300 audit(1653425583.136:54): SYSCALL arch=c000003e syscall=1 success=yes exit=2 a0=3 a1=5596fcae1fb0 a2=2 a3=2 items=0 ppid=184 pid=229 auid=4294967295 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=pts0 ses=4294967295 comm=&quot;python3&quot; exe=&quot;/usr/bin/python3.10&quot; key=(null)
+type=1327 audit(1653425583.136:54): PROCTITLE proctitle=707974686F6E3300746573742F6D61696E2E7079002D66002E2
 </code></pre>
-<p>This event is emitted when a policy is activated via the securityfs node,
-<code>/sys/kernel/security/ipe/policies/$policy_name/active</code>
-or when a policy is activated in place via
-<code>$SECURITYFS/ipe/policies/&lt;policy_name&gt;/raw</code>. It is emitted to the audit
-channel, and can be used to provide a record of when policies were made active.</p>
+<p>This event indicates that IPE switched the active policy from one to another along with the version and the hash digest of the two policies.
+Note IPE can only have one policy active at a time, all access decision evaluation is based on the current active policy.
+The normal procedure to deploy a new policy is loading the policy to deploy into the kernel first, then switch the active policy to it.</p>
+<p>This record will always be emitted in conjunction with a <code>AUDITSYSCALL</code> record for the <code>write</code> syscall.</p>
+<p>Field descriptions:</p>
 <table>
 <thead>
 <tr>
-<th style="text-align: center;">Field</th>
-<th style="text-align: left;">Description</th>
+<th>Field</th>
+<th>Value Type</th>
+<th>Optional?</th>
+<th>Description of Value</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td style="text-align: center;">policy_name</td>
-<td style="text-align: left;">The <code>policy_name</code> field of the policy</td>
+<td>old_active_pol_name</td>
+<td>string</td>
+<td>No</td>
+<td>The name of previous active policy</td>
 </tr>
 <tr>
-<td style="text-align: center;">policy_version</td>
-<td style="text-align: left;">The <code>policy_version</code> triple <em>parsed</em> from the policy<sup>1</sup></td>
+<td>old_active_pol_version</td>
+<td>string</td>
+<td>No</td>
+<td>The version of previous active policy</td>
+</tr>
+<tr>
+<td>old_policy_digest</td>
+<td>string</td>
+<td>No</td>
+<td>The hash of previous active policy</td>
+</tr>
+<tr>
+<td>new_active_pol_name</td>
+<td>string</td>
+<td>No</td>
+<td>The name of current active policy</td>
+</tr>
+<tr>
+<td>new_active_pol_version</td>
+<td>string</td>
+<td>No</td>
+<td>The version of current active policy</td>
+</tr>
+<tr>
+<td>new_policy_digest</td>
+<td>string</td>
+<td>No</td>
+<td>The hash of current active policy</td>
+</tr>
+<tr>
+<td>auid</td>
+<td>integer</td>
+<td>No</td>
+<td>The login user ID</td>
+</tr>
+<tr>
+<td>ses</td>
+<td>integer</td>
+<td>No</td>
+<td>The login session ID</td>
+</tr>
+<tr>
+<td>lsm</td>
+<td>string</td>
+<td>No</td>
+<td>The LSM name associated with the event</td>
+</tr>
+<tr>
+<td>res</td>
+<td>integer</td>
+<td>No</td>
+<td>The result of the audited operation(success/fail)</td>
 </tr>
 </tbody>
 </table>
-<h2 id="ipe-mode-switch">IPE Mode Switch</h2>
-<pre><code class="language-auditd">AUDIT1811 IPE mode=enforce
-AUDIT1811 IPE mode=permissive
+<h2 id="1422-audit_ipe_policy_load">1422 AUDIT_IPE_POLICY_LOAD</h2>
+<p>Event Example:</p>
+<pre><code>type=1422 audit(1653425529.927:53): policy_name=&quot;boot_verified&quot; policy_version=0.0.0 policy_digest=sha256:820EEA5B40CA42B51F68962354BA083122A20BB846F26765076DD8EED7B8F4DB auid=4294967295 ses=4294967295 lsm=ipe res=1
+type=1300 audit(1653425529.927:53): arch=c000003e syscall=1 success=yes exit=2567 a0=3 a1=5596fcae1fb0 a2=a07 a3=2 items=0 ppid=184 pid=229 auid=4294967295 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=pts0 ses=4294967295 comm=&quot;python3&quot; exe=&quot;/usr/bin/python3.10&quot; key=(null)
+type=1327 audit(1653425529.927:53): PROCTITLE proctitle=707974686F6E3300746573742F6D61696E2E7079002D66002E2E
 </code></pre>
-<p>This event is emitted when the IPE's mode of operation is changed through the <code>sysctl
-ipe.enforce</code>. It is emitted to the audit channel, additionally, this event is emitted
-early during system boot to the kernel channel (audit is not emitted) to identify
-what mode IPE is started in.</p>
+<p>This record indicates a new policy has been loaded into the kernel with the policy name, policy version and policy hash.</p>
+<p>This record will always be emitted in conjunction with a <code>AUDITSYSCALL</code> record for the <code>write</code> syscall.</p>
+<p>Field descriptions:</p>
 <table>
 <thead>
 <tr>
-<th style="text-align: center;">Field</th>
-<th style="text-align: left;">Description</th>
+<th>Field</th>
+<th>Value Type</th>
+<th>Optional?</th>
+<th>Description of Value</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td style="text-align: center;">mode</td>
-<td style="text-align: left;">The mode that IPE is set to. Can be either: <code>enforce</code> or <code>permissive</code>. See <a href="../#modes">the modes documentation for more information.</a></td>
+<td>policy_name</td>
+<td>string</td>
+<td>No</td>
+<td>The policy_name</td>
+</tr>
+<tr>
+<td>policy_version</td>
+<td>string</td>
+<td>No</td>
+<td>The policy_version</td>
+</tr>
+<tr>
+<td>policy_digest</td>
+<td>string</td>
+<td>No</td>
+<td>The policy hash</td>
+</tr>
+<tr>
+<td>auid</td>
+<td>integer</td>
+<td>No</td>
+<td>The login user ID</td>
+</tr>
+<tr>
+<td>ses</td>
+<td>integer</td>
+<td>No</td>
+<td>The login session ID</td>
+</tr>
+<tr>
+<td>lsm</td>
+<td>string</td>
+<td>No</td>
+<td>The LSM name associated with the event</td>
+</tr>
+<tr>
+<td>res</td>
+<td>integer</td>
+<td>No</td>
+<td>The result of the audited operation(success/fail)</td>
 </tr>
 </tbody>
 </table>
-<h2 id="ipe-binary-event">IPE Binary Event</h2>
-<pre><code class="language-auditd">AUDIT1810 IPE ctx_pid=297 ctx_op=EXECUTE ctx_hook=EXEC ctx_comm=&quot;sysctl&quot; ctx_audit_pathname=&quot;/usr/lib/libc-2.30.so&quot; ctx_ino=135442 ctx_dev=vda prop_boot_verified=TRUE prop_dmverity_roothash=NULL prop_dmverity_signature=FALSE rule=&quot;DEFAULT action=DENY&quot;
+<h2 id="1404-audit_mac_status">1404 AUDIT_MAC_STATUS</h2>
+<p>Event Examples:</p>
+<pre><code>type=1404 audit(1653425689.008:55): enforcing=0 old_enforcing=1 auid=4294967295 ses=4294967295 enabled=1 old-enabled=1 lsm=ipe res=1
+type=1300 audit(1653425689.008:55): arch=c000003e syscall=1 success=yes exit=2 a0=1 a1=55c1065e5c60 a2=2 a3=0 items=0 ppid=405 pid=441 auid=0 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=)
+type=1327 audit(1653425689.008:55): proctitle=&quot;-bash&quot;
+
+type=1404 audit(1653425689.008:55): enforcing=1 old_enforcing=0 auid=4294967295 ses=4294967295 enabled=1 old-enabled=1 lsm=ipe res=1
+type=1300 audit(1653425689.008:55): arch=c000003e syscall=1 success=yes exit=2 a0=1 a1=55c1065e5c60 a2=2 a3=0 items=0 ppid=405 pid=441 auid=0 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=)
+type=1327 audit(1653425689.008:55): proctitle=&quot;-bash&quot;
 </code></pre>
-<p>This event is emitted when IPE evaluates a binary. By default<sup>2</sup>, 
-it will only be triggered on "action=DENY" events, or "blocks". This event
-provides a record of execution that violated policy and can be used to identify
-gaps within the currently deployed policy, or a system that may be
-under attack. Certain fields may be omitted, or replaced with <code>ERR(%d)</code>
-which identifes the error code when attempting to retrieve that value.</p>
+<p>This record will always be emitted in conjunction with a <code>AUDITSYSCALL</code> record for the <code>write</code> syscall.</p>
+<p>Field descriptions:</p>
 <table>
 <thead>
 <tr>
-<th style="text-align: center;">Field</th>
-<th style="text-align: left;">Description</th>
-<th style="text-align: center;">Optional</th>
+<th>Field</th>
+<th>Value Type</th>
+<th>Optional?</th>
+<th>Description of Value</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td style="text-align: center;"><code>ctx_pid</code></td>
-<td style="text-align: left;">The <a href="https://en.wikipedia.org/wiki/Process_identifier">process ID</a> of the process being evaluated.</td>
-<td style="text-align: center;">No</td>
+<td>enforcing</td>
+<td>integer</td>
+<td>No</td>
+<td>The enforcing state IPE is being switched to, 1 is in enforcing mode, 0 is in permissive mode</td>
 </tr>
 <tr>
-<td style="text-align: center;"><code>ctx_op</code></td>
-<td style="text-align: left;">The operation that IPE is evaluating the file under. See <a href="../properties/#op">op</a>.</td>
-<td style="text-align: center;">No</td>
+<td>old_enforcing</td>
+<td>integer</td>
+<td>No</td>
+<td>The enforcing state IPE is being switched from, 1 is in enforcing mode, 0 is in permissive mode</td>
 </tr>
 <tr>
-<td style="text-align: center;"><code>ctx_hook</code></td>
-<td style="text-align: left;">The LSM hook that the file is being evaluated under. Provides a more granular description that <code>ctx_op</code>.</td>
-<td style="text-align: center;">No</td>
+<td>auid</td>
+<td>integer</td>
+<td>No</td>
+<td>The login user ID</td>
 </tr>
 <tr>
-<td style="text-align: center;"><code>ctx_comm</code></td>
-<td style="text-align: left;">The effective name of the process, as evaluated by the kernel.</td>
-<td style="text-align: center;">No</td>
+<td>ses</td>
+<td>integer</td>
+<td>No</td>
+<td>The login session ID</td>
 </tr>
 <tr>
-<td style="text-align: center;"><code>ctx_audit_pathname</code></td>
-<td style="text-align: left;">The effective absolute path to the file being evaluated. Walks past chroots and mount points.</td>
-<td style="text-align: center;">Yes</td>
+<td>enabled</td>
+<td>integer</td>
+<td>No</td>
+<td>The new TTY audit enabled setting</td>
 </tr>
 <tr>
-<td style="text-align: center;"><code>ctx_ino</code></td>
-<td style="text-align: left;">The inode number of the file being evaluated.</td>
-<td style="text-align: center;">Yes</td>
+<td>old-enabled</td>
+<td>integer</td>
+<td>No</td>
+<td>The old TTY audit enabled setting</td>
 </tr>
 <tr>
-<td style="text-align: center;"><code>ctx_dev</code></td>
-<td style="text-align: left;">The device name that the file belongs to.</td>
-<td style="text-align: center;">Yes</td>
+<td>lsm</td>
+<td>string</td>
+<td>No</td>
+<td>The LSM name associated with the event</td>
 </tr>
 <tr>
-<td style="text-align: center;"><code>prop_boot_verified</code></td>
-<td style="text-align: left;">The evaluation of the property, <code>boot_verified</code>. Can be ommitted if this property is not present in the kernel (not compiled in).</td>
-<td style="text-align: center;">Yes</td>
-</tr>
-<tr>
-<td style="text-align: center;"><code>prop_dmverity_roothash</code></td>
-<td style="text-align: left;">The evaluation of the property, <code>dmverity_roothash</code>. Can be ommitted if this property is not present in the kernel (not compiled in).</td>
-<td style="text-align: center;">Yes</td>
-</tr>
-<tr>
-<td style="text-align: center;"><code>prop_dmverity_signature</code></td>
-<td style="text-align: left;">The evaluation of the property, <code>dmverity_signature</code>. Can be ommitted if this property is not present in the kernel (not compiled in).</td>
-<td style="text-align: center;">Yes</td>
-</tr>
-<tr>
-<td style="text-align: center;"><code>rule</code></td>
-<td style="text-align: left;">The plain-text approximation of the rule that was matched.</td>
-<td style="text-align: center;">No</td>
+<td>res</td>
+<td>integer</td>
+<td>No</td>
+<td>The result of the audited operation (success/fail)</td>
 </tr>
 </tbody>
 </table>
-<hr />
-<p><sup>1</sup> A policy with 4+ version numbers will parse successfully, but
-only the first three will be considered as part of the version. These fields
-will only emit the parsed version.</p>
-<p><sup>2</sup> IPE supports success auditing. When enabled, all events that pass IPE 
-policy and are not blocked will emit an audit event. This is disabled by 
-default, and can be enabled via the kernel command line
-<code>ipe.success_audit=(0|1)</code> or the securityfs node, <code>/sys/kernel/security/ipe/success_audit</code></p>
-<p>This is very noisy, as IPE will check every user-mode binary on the system,
-but is useful for debugging policies.</p></div>
+<h2 id="success-auditing">Success Auditing</h2>
+<p>IPE supports success auditing. When enabled, all events that pass IPE policy and are not blocked will emit an audit event. This is disabled by default, and can be enabled via the kernel command line <code>ipe.success_audit=(0|1)</code> or <code>/sys/kernel/security/ipe/success_audit</code> securityfs file.</p>
+<p>This is <em>very</em> noisy, as IPE will check every userspace binary on the system, but is useful for debugging policies.</p>
+<p><strong>NOTE:</strong></p>
+<p>If a traditional MAC system is enabled (SELinux, apparmor, smack, etcetera), all writes to ipe's securityfs nodes require <code>CAP_MAC_ADMIN</code>.</p></div>
             </div>
         </div>
 
