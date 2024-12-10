@@ -1,5 +1,5 @@
 # Integrity Policy Enforcement (IPE)
-
+**Notice:** This website will not be maintained in the future. Please refer to the [latest documentation](https://docs.kernel.org/next/admin-guide/LSM/ipe.html) on kernel.org.
 ## Overview
 
 Integrity Policy Enforcement (IPE) is a Linux Security Module that takes a
