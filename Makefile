@@ -7,7 +7,7 @@ OUTPUT=output
 PYTHON=python3
 POLICY=policies
 
-all: hello hellosh hellolib memfd_test mmap_test mprotect_test copy_lib copy_bin $(VOL) $(VOL_FSVERITY)
+all: hello hellosh hellolib memfd_test memfd_hugepage_test mmap_test mprotect_test copy_lib copy_bin $(VOL) $(VOL_FSVERITY)
 
 $(VOL):
 	mkdir -p $(VOL)
@@ -49,6 +49,10 @@ memfd_test: $(VOL)/bin/memfd_test
 $(VOL)/bin/memfd_test: $(VOL)
 	$(CC) $(WFLAGS) -o $(VOL)/bin/memfd_test $(SRC)/memfd_test.c
 
+memfd_hugepage_test: $(VOL)/bin/memfd_hugepage_test
+$(VOL)/bin/memfd_hugepage_test: $(VOL)
+	$(CC) $(WFLAGS) -o $(VOL)/bin/memfd_hugepage_test $(SRC)/memfd_hugepage_test.c
+
 mmap_test: $(VOL)/bin/mmap_test
 $(VOL)/bin/mmap_test: $(VOL)
 	$(CC) $(WFLAGS) -o $(VOL)/bin/mmap_test $(SRC)/mmap_test.c
@@ -69,7 +73,7 @@ allow_all:
         fi
 
 test: prepare_test allow_all
-	$(PYTHON) test/main.py -n $(OUTPUT)/$(shell basename $(VOL)) -f $(VOL_FSVERITY) -p $(POLICY) --simple --mem --linker --load-policy
+	$(PYTHON) test/main.py -n $(OUTPUT)/$(shell basename $(VOL)) -f $(VOL_FSVERITY) -p $(POLICY) -a $(VOL) --simple --mem --linker --load-policy
 
 clean: clean_vol clean_output clean_vol_fsverity
 

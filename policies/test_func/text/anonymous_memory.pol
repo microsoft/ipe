@@ -1,0 +1,4 @@
+policy_name=anonymous_memory policy_version=0.0.0
+DEFAULT action=ALLOW
+
+op=EXECUTE anonymous_memory=TRUE action=DENY

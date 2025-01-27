@@ -95,7 +95,13 @@ def parse_config():
                     action="store",
                     dest="fsverity",
                     type=PurePath,
-                    help="Path to the bin resouces to test fsverity verified, the fsverity verified tests will only run when this path is set")
+                    help="Path to the bin resources to test fsverity verified, the fsverity verified tests will only run when this path is set")
+    ap.add_argument("-a", "--anonymous_binary_folder",
+                    action="store",
+                    dest="anon_binary",
+                    type=PurePath,
+                    help="Path to the bin resources to test anonymous memory, the anonymous memory tests will only run when this path is set")
+
 
     add_log_config(ap)
     add_test_config(ap)
@@ -135,6 +141,7 @@ if __name__ == "__main__":
     from ipe.dmverity_roothash import DMVerityRootHashTests
     from ipe.fsverity_verified import FSVerityVerifiedTests
     from ipe.fsverity_measurement import FSVerityMeasurementTests
+    from ipe.anonymous_memory import AnonymousMemoryTests
     from ipe.policy_load import PolicyLoadTests
     from unittest import TextTestRunner, TestSuite
 
@@ -162,5 +169,7 @@ if __name__ == "__main__":
     if not argv.fsverity is None:
         tests.addTest(add_test(FSVerityVerifiedTests, argv, enabled_tests))
         tests.addTest(add_test(FSVerityMeasurementTests, argv, enabled_tests))
+    if not argv.anon_binary is None:
+        tests.addTest(AnonymousMemoryTests.build_test(AnonymousMemoryTests, argv=argv))
 
     runner.run(tests)

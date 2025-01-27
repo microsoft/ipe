@@ -93,6 +93,15 @@ class IPETestCase(TestCase):
         (returncode, _, _) = exec_memfd(self._allow)
         self.assertEqual(returncode, PERMISSION_ERROR_CODE)
 
+    def test_smoke_hugepage_memfd_deny(self):
+        from ipe.templates.smoke.simple import mmap_exec_hugepage_memfd
+
+        if SIMPLE_TEST_KEY not in self.__tests:
+            self.skipTest("Simple tests not selected...")
+
+        (returncode, _, _) = mmap_exec_hugepage_memfd(self._allow)
+        self.assertEqual(returncode, PERMISSION_ERROR_CODE)
+
     def test_smoke_ffi_deny(self):
         from ipe.templates.smoke.simple import ffi
 

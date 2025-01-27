@@ -49,6 +49,23 @@ def exec_memfd(path):
     """
     return util._exec(f"{path}/bin/memfd_test", [f"{path}/bin/hello"])
 
+def mmap_exec_hugepage_memfd(path):
+    """
+        mmap_exec_hugepage_memfd:
+          very basic smoke test to ensure IPE is working
+          on hugepage memfd, with verified content.
+
+        As of IPE's initial release, this should always be blocked,
+        for all available properties.
+
+        Invokes a helper binary located in a subfolder of
+        the path passed in. Returns the return code of the execution
+
+        @path: path to the root of the test resource folder
+        @rv: (return code, stdout, stderr)
+    """
+    return util._exec(f"{path}/bin/memfd_hugepage_test", [])
+
 def ffi(path, securityfs_root):
     """
         ffi:
