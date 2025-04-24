@@ -84,6 +84,32 @@ class IPETestCase(TestCase):
         with self.assertRaises(PermissionError):
             interpreter(self._deny)
 
+    def test_smoke_indirect_script_allow(self):
+        from ipe import util
+
+        if SIMPLE_TEST_KEY not in self.__tests:
+            self.skipTest("Simple tests not selected...")
+
+        inc_cmd = f"{self._allow}/bin/inc"
+        inc_args = [f"{self._allow}/script/hello.inc"]
+
+        (returncode, _, stderr) = util._exec(inc_cmd, inc_args)
+        if stderr != b'':
+            logging.error(f"test_smoke_indirect_script_allow with error messge: {stderr.decode()}")
+        self.assertEqual(returncode, 0)
+
+    def test_smoke_indirect_script_deny(self):
+        from ipe import util
+
+        if SIMPLE_TEST_KEY not in self.__tests:
+            self.skipTest("Simple tests not selected...")
+
+        inc_cmd = f"{self._allow}/bin/inc"
+        inc_args = [f"{self._deny}/script/hello.inc"]
+
+        (returncode, _, _) = util._exec(inc_cmd, inc_args)
+        self.assertEqual(returncode, PERMISSION_ERROR_CODE)
+
     def test_smoke_memfd_deny(self):
         from ipe.templates.smoke.simple import exec_memfd
 
