@@ -7,7 +7,7 @@ OUTPUT=output
 PYTHON=python3
 POLICY=policies
 
-all: hello hellosh hellolib memfd_test mmap_test mprotect_test copy_lib copy_bin $(VOL) $(VOL_FSVERITY)
+all: hello hellosh hellolib memfd_test mmap_test mprotect_test copy_lib copy_bin inc helloinc $(VOL) $(VOL_FSVERITY)
 
 $(VOL):
 	mkdir -p $(VOL)
@@ -40,6 +40,14 @@ $(VOL)/bin/hello: $(VOL)
 hellosh: $(VOL)/script/hello.sh
 $(VOL)/script/hello.sh: $(VOL)
 	cp $(SRC)/hello.sh $(VOL)/script/hello.sh
+
+inc: $(VOL)/bin/inc
+$(VOL)/bin/inc: $(VOL) $(SRC)/inc.c
+	$(CC) $(WFLAGS) -o $(VOL)/bin/inc $(SRC)/inc.c
+
+helloinc: $(VOL)/script/hello.inc
+$(VOL)/script/hello.inc: $(VOL) $(SRC)/hello.inc
+	cp -p $(SRC)/hello.inc $(VOL)/script/hello.inc
 
 hellolib: $(VOL)/lib/libhello.so
 $(VOL)/lib/libhello.so: $(VOL)
