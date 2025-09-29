@@ -3,11 +3,15 @@ WFLAGS=-Werror -Wextra -Wpedantic
 SRC=src
 VOL=vol
 VOL_FSVERITY=vol_fsverity
+
+# Kernel headers for AT_EXECVE_CHECK support (requires Linux 6.14+)
+KERNEL_DIR ?= /usr/src/linux-headers-$(shell uname -r)
+KERNEL_INCLUDES = -I$(KERNEL_DIR)/include/uapi -I$(KERNEL_DIR)/include
 OUTPUT=output
 PYTHON=python3
 POLICY=policies
 
-all: hello hellosh hellolib memfd_test mmap_test mprotect_test copy_lib copy_bin $(VOL) $(VOL_FSVERITY)
+all: hello hellosh hellolib memfd_test mmap_test mprotect_test copy_lib copy_bin inc incrementinc $(VOL) $(VOL_FSVERITY)
 
 $(VOL):
 	mkdir -p $(VOL)
@@ -56,6 +60,14 @@ $(VOL)/bin/mmap_test: $(VOL)
 mprotect_test: $(VOL)/bin/mprotect_test
 $(VOL)/bin/mprotect_test: $(VOL)
 	$(CC) $(WFLAGS) -o $(VOL)/bin/mprotect_test $(SRC)/mprotect_test.c
+
+inc: $(VOL)/bin/inc
+$(VOL)/bin/inc: $(VOL) $(SRC)/inc.c
+	$(CC) -Wall -Wextra $(KERNEL_INCLUDES) -o $(VOL)/bin/inc $(SRC)/inc.c
+
+incrementinc: $(VOL)/script/increment.inc
+$(VOL)/script/increment.inc: $(VOL) $(SRC)/increment.inc
+	cp -p $(SRC)/increment.inc $(VOL)/script/increment.inc
 
 prepare_test:
 	mkdir -p $(OUTPUT)

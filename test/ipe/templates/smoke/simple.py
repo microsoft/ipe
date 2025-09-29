@@ -66,3 +66,18 @@ def ffi(path, securityfs_root):
     import ctypes
     util.ipe_enforce_mode_on(securityfs_root)
     ctypes.CFUNCTYPE(None, ctypes.c_int)(lambda x: None)
+
+def indirect_script(interpreter_path, script_path):
+    """
+        indirect_script:
+          Test script enforcement via interpreter
+
+        Uses an interpreter (like inc) to execute a script file.
+        This tests IPE's ability to enforce policies on indirectly
+        executed scripts through interpreters.
+
+        @interpreter_path: path to the interpreter binary
+        @script_path: path to the script to execute
+        @rv: (return code, stdout, stderr)
+    """
+    return util._exec(interpreter_path, [script_path])
