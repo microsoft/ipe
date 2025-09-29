@@ -5,6 +5,9 @@
  * - "?" to initialize a counter from user's input;
  * - "+" to increment the counter (which is set to 0 by default).
  *
+ * This file is adapted from:
+ * samples/check-exec/inc.c from the Linux kernel source tree
+ *
  * See tools/testing/selftests/exec/check-exec-tests.sh and
  * Documentation/userspace-api/check_exec.rst
  *
