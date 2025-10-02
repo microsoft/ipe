@@ -70,7 +70,7 @@ def ffi(path, securityfs_root):
 def indirect_script(interpreter_path, script_path):
     """
         indirect_script:
-          Test script enforcement via interpreter
+          Test script enforcement via interpreter.
 
         Uses an interpreter (like inc) to execute a script file.
         This tests IPE's ability to enforce policies on indirectly
@@ -81,3 +81,37 @@ def indirect_script(interpreter_path, script_path):
         @rv: (return code, stdout, stderr)
     """
     return util._exec(interpreter_path, [script_path])
+
+def interpreter_command_mode(interpreter_path, command):
+    """
+        interpreter_command_mode:
+          Test interpreter command-line execution mode (-c option).
+
+        Uses an interpreter's -c option to execute a command directly.
+        This tests that command-line execution uses AT_EXECVE_CHECK
+        for consistent IPE enforcement across all execution modes.
+
+        @interpreter_path: path to the interpreter binary
+        @command: command string to execute
+        @rv: (return code, stdout, stderr)
+    """
+    return util._exec(interpreter_path, ["-c", command])
+
+def interpreter_stdin_mode(interpreter_path, script_path):
+    """
+        interpreter_stdin_mode:
+          Test interpreter stdin execution mode (-i option).
+
+        Uses an interpreter's -i option to execute a script via stdin.
+        This tests that stdin execution uses AT_EXECVE_CHECK
+        for consistent IPE enforcement across all execution modes.
+
+        @interpreter_path: path to the interpreter binary
+        @script_path: path to the script to pipe as stdin
+        @rv: (return code, stdout, stderr)
+    """
+    import subprocess
+    with open(script_path, 'rb') as script_file:
+        result = subprocess.run([interpreter_path, "-i"],
+                              stdin=script_file, capture_output=True, timeout=5)
+        return (result.returncode, result.stdout, result.stderr)

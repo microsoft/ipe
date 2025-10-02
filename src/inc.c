@@ -104,8 +104,10 @@ static void print_usage(const char *argv0)
 {
 	fprintf(stderr, "usage: %s <script.inc> | -i | -c <command>\n\n",
 		argv0);
-	fprintf(stderr, "Example:\n");
-	fprintf(stderr, "  ./set-exec -fi -- ./inc -i < script-exec.inc\n");
+	fprintf(stderr, "Examples:\n");
+	fprintf(stderr, "  %s script.inc\n", argv0);
+	fprintf(stderr, "  %s -i < script.inc\n", argv0);
+	fprintf(stderr, "  %s -c '+'\n", argv0);
 }
 
 int main(const int argc, char *const argv[], char *const *const envp)
@@ -146,9 +148,17 @@ int main(const int argc, char *const argv[], char *const *const envp)
 
 	if (cmd) {
 		/*
-		 * For IPE testing, we don't need securebits-based interactive
-		 * denial. Just process the command directly.
+		 * For IPE testing with command-line execution, we also
+		 * enforce via AT_EXECVE_CHECK to ensure consistent policy
+		 * enforcement across all execution modes.
 		 */
+		char *const cmd_argv[] = { argv[0], "-c", cmd, NULL };
+		int err = sys_execveat(AT_FDCWD, argv[0], cmd_argv, envp, AT_EXECVE_CHECK);
+		if (err) {
+			fprintf(stderr,
+				"Command execution denied by security policy (errno=%d)\n", errno);
+			return errno;
+		}
 		return interpret_buffer(cmd, strlen(cmd));
 	}
 

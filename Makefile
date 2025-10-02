@@ -11,7 +11,7 @@ OUTPUT=output
 PYTHON=python3
 POLICY=policies
 
-all: hello hellosh hellolib memfd_test mmap_test mprotect_test copy_lib copy_bin inc incrementinc $(VOL) $(VOL_FSVERITY)
+all: hello hellosh hellolib memfd_test mmap_test mprotect_test inc incrementinc copy_lib copy_bin $(VOL) $(VOL_FSVERITY)
 
 $(VOL):
 	mkdir -p $(VOL)
