@@ -112,30 +112,6 @@ class IPETestCase(TestCase):
 
         self.assertEqual(returncode, PERMISSION_ERROR_CODE)
 
-    def test_smoke_interpreter_command_mode_allow(self):
-        from ipe.templates.smoke.simple import interpreter_command_mode
-
-        if SIMPLE_TEST_KEY not in self.__tests:
-            self.skipTest("Simple tests not selected...")
-
-        interpreter_path = f"{self._allow}/bin/inc"
-
-        (returncode, _, stderr) = interpreter_command_mode(interpreter_path, "+")
-        if stderr != b'':
-            logging.error(f"smoke_interpreter_command_mode_allow with error message: {stderr.decode()}")
-        self.assertEqual(returncode, 0)
-
-    def test_smoke_interpreter_command_mode_deny(self):
-        from ipe.templates.smoke.simple import interpreter_command_mode
-
-        if SIMPLE_TEST_KEY not in self.__tests:
-            self.skipTest("Simple tests not selected...")
-
-        interpreter_path = f"{self._deny}/bin/inc"
-
-        with self.assertRaises(PermissionError):
-            interpreter_command_mode(interpreter_path, "+")
-
     def test_smoke_interpreter_stdin_mode_allow(self):
         from ipe.templates.smoke.simple import interpreter_stdin_mode
 

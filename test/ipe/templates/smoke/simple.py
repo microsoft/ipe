@@ -82,21 +82,6 @@ def indirect_script(interpreter_path, script_path):
     """
     return util._exec(interpreter_path, [script_path])
 
-def interpreter_command_mode(interpreter_path, command):
-    """
-        interpreter_command_mode:
-          Test interpreter command-line execution mode (-c option).
-
-        Uses an interpreter's -c option to execute a command directly.
-        This tests that command-line execution uses AT_EXECVE_CHECK
-        for consistent IPE enforcement across all execution modes.
-
-        @interpreter_path: path to the interpreter binary
-        @command: command string to execute
-        @rv: (return code, stdout, stderr)
-    """
-    return util._exec(interpreter_path, ["-c", command])
-
 def interpreter_stdin_mode(interpreter_path, script_path):
     """
         interpreter_stdin_mode:
@@ -110,8 +95,8 @@ def interpreter_stdin_mode(interpreter_path, script_path):
         @script_path: path to the script to pipe as stdin
         @rv: (return code, stdout, stderr)
     """
-    import subprocess
-    with open(script_path, 'rb') as script_file:
-        result = subprocess.run([interpreter_path, "-i"],
-                              stdin=script_file, capture_output=True, timeout=5)
-        return (result.returncode, result.stdout, result.stderr)
+    # Get shell from same volume
+    shell_path = interpreter_path.rsplit("/", 1)[0] + "/sh"
+
+    cmd = f"{interpreter_path} -i < {script_path}"
+    return util._exec(shell_path, ["-c", cmd])

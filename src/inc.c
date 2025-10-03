@@ -73,7 +73,7 @@ static int interpret_buffer(char *buffer, size_t buffer_size)
 	return 0;
 }
 
-/* Returns 1 on error, 0 otherwise. */
+/* Returns errno on error, 0 otherwise. */
 static int interpret_stream(FILE *script, char *const script_name,
 			    char *const *const envp)
 {
@@ -102,67 +102,37 @@ static int interpret_stream(FILE *script, char *const script_name,
 
 static void print_usage(const char *argv0)
 {
-	fprintf(stderr, "usage: %s <script.inc> | -i | -c <command>\n\n",
+	fprintf(stderr, "usage: %s <script.inc> | -i\n\n",
 		argv0);
 	fprintf(stderr, "Examples:\n");
 	fprintf(stderr, "  %s script.inc\n", argv0);
 	fprintf(stderr, "  %s -i < script.inc\n", argv0);
-	fprintf(stderr, "  %s -c '+'\n", argv0);
 }
 
 int main(const int argc, char *const argv[], char *const *const envp)
 {
 	int opt;
-	char *cmd = NULL;
 	char *script_name = NULL;
 	bool interpret_stdin = false;
 	FILE *script_file = NULL;
-	size_t arg_nb;
 
-	while ((opt = getopt(argc, argv, "c:i")) != -1) {
-		switch (opt) {
-		case 'c':
-			if (cmd) {
-				fprintf(stderr, "ERROR: Command already set");
-				return 1;
-			}
-			cmd = optarg;
-			break;
-		case 'i':
+	while ((opt = getopt(argc, argv, "i")) != -1) {
+		if (opt == 'i') {
 			interpret_stdin = true;
-			break;
-		default:
+		} else {
 			print_usage(argv[0]);
 			return 1;
 		}
 	}
 
-	/* Checks that only one argument is used, or read stdin. */
-	arg_nb = !!cmd + !!interpret_stdin;
-	if (arg_nb == 0 && argc == 2) {
+	if (!interpret_stdin && argc == 2) {
 		script_name = argv[1];
-	} else if (arg_nb != 1) {
+	} else if (!interpret_stdin && argc != 2) {
 		print_usage(argv[0]);
 		return 1;
 	}
 
-	if (cmd) {
-		/*
-		 * For IPE testing with command-line execution, we also
-		 * enforce via AT_EXECVE_CHECK to ensure consistent policy
-		 * enforcement across all execution modes.
-		 */
-		char *const cmd_argv[] = { argv[0], "-c", cmd, NULL };
-		int err = sys_execveat(AT_FDCWD, argv[0], cmd_argv, envp, AT_EXECVE_CHECK);
-		if (err) {
-			fprintf(stderr,
-				"Command execution denied by security policy (errno=%d)\n", errno);
-			return errno;
-		}
-		return interpret_buffer(cmd, strlen(cmd));
-	}
-
-	if (interpret_stdin && !script_name) {
+	if (interpret_stdin) {
 		script_file = stdin;
 		/*
 		 * As for any execve(2) call, this path may be logged by the
@@ -173,7 +143,7 @@ int main(const int argc, char *const argv[], char *const *const envp)
 		 * For IPE testing with stdin, always enforce via AT_EXECVE_CHECK.
 		 */
 		return interpret_stream(script_file, script_name, envp);
-	} else if (script_name && !interpret_stdin) {
+	} else if (script_name) {
 		/*
 		 * In this sample, we don't pass any argument to scripts, but
 		 * otherwise we would have to forge an argv with such
