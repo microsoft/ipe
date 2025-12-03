@@ -20,12 +20,32 @@ The following dependencies are required:
 - fsverity
 - gcc
 - keyutils
+- Linux kernel 6.14+ (Required for AT_EXECVE_CHECK support in script interpretation)
 
 You can install all dependencies using the following command:
 
 ```bash
 apt install build-essential patchelf fsverity keyutils
 ```
+
+### Kernel Headers
+
+For AT_EXECVE_CHECK functionality, you need Linux 6.14+ kernel headers for compilation.
+
+**Default header locations** (the build system checks these automatically):
+- `/usr/src/linux-headers-$(uname -r)/include/uapi/`
+- `/usr/src/linux-headers-$(uname -r)/include/`
+
+**Using custom header location:**
+If you have kernel source/headers in a different location:
+```bash
+make KERNEL_DIR=/path/to/kernel/source
+# Example: make KERNEL_DIR=/home/user/linux-6.16.5
+```
+
+The build system will look for headers in:
+- `$(KERNEL_DIR)/include/uapi/linux/fcntl.h` (for AT_EXECVE_CHECK definition)
+- `$(KERNEL_DIR)/include/linux/` (for other kernel headers)
 
 ## Preparing for Testing
 

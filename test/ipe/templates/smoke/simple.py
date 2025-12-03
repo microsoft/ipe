@@ -66,3 +66,37 @@ def ffi(path, securityfs_root):
     import ctypes
     util.ipe_enforce_mode_on(securityfs_root)
     ctypes.CFUNCTYPE(None, ctypes.c_int)(lambda x: None)
+
+def indirect_script(interpreter_path, script_path):
+    """
+        indirect_script:
+          Test script enforcement via interpreter.
+
+        Uses an interpreter (like inc) to execute a script file.
+        This tests IPE's ability to enforce policies on indirectly
+        executed scripts through interpreters.
+
+        @interpreter_path: path to the interpreter binary
+        @script_path: path to the script to execute
+        @rv: (return code, stdout, stderr)
+    """
+    return util._exec(interpreter_path, [script_path])
+
+def interpreter_stdin_mode(interpreter_path, script_path):
+    """
+        interpreter_stdin_mode:
+          Test interpreter stdin execution mode (-i option).
+
+        Uses an interpreter's -i option to execute a script via stdin.
+        This tests that stdin execution uses AT_EXECVE_CHECK
+        for consistent IPE enforcement across all execution modes.
+
+        @interpreter_path: path to the interpreter binary
+        @script_path: path to the script to pipe as stdin
+        @rv: (return code, stdout, stderr)
+    """
+    # Get shell from same volume
+    shell_path = interpreter_path.rsplit("/", 1)[0] + "/sh"
+
+    cmd = f"{interpreter_path} -i < {script_path}"
+    return util._exec(shell_path, ["-c", cmd])
