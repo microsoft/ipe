@@ -33,7 +33,7 @@ static int sys_execveat(int dirfd, const char *pathname, char *const argv[],
 }
 
 /* Returns 1 on error, 0 otherwise. */
-static int interpret_buffer(char *buffer, size_t buffer_size)
+static int interpret_buffer(char *buffer)
 {
 	char *line, *saveptr = NULL;
 	long long number = 0;
@@ -97,7 +97,7 @@ static int interpret_stream(FILE *script, char *const script_name,
 
 	/* Reads script. */
 	buf_size = fread(buf, 1, buf_size - 1, script);
-	return interpret_buffer(buf, buf_size);
+	return interpret_buffer(buf);
 }
 
 static void print_usage(const char *argv0)
